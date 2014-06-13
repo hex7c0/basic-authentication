@@ -1,0 +1,30 @@
+{
+  "name": "basic-authentication",
+  "version": "0.0.1",
+  "description": "basic authentication for nodejs request",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/hex7c0/basic-authentication.git"
+  },
+  "bugs": {
+    "url": "https://github.com/hex7c0/basic-authentication/issues"
+  },
+  "author": {
+    "name": "hex7c0",
+    "email": "hex7c0@gmail.com",
+    "url": "http://hex7c0.tk/"
+  },
+  "dependencies": {},
+  "engines": {
+    "node": ">0.8.0"
+  },
+  "keywords": [
+    "basic",
+    "authentication",
+    "authorization",
+    "basicauth"
+  ],
+  "license": "GPLv3",
+  "homepage": "https://github.com/hex7c0/basic-authentication/"
+}
