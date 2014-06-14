@@ -56,6 +56,8 @@ app.get('/',function(req,res) {
  - `functions` - **Boolean** Flag for using module like a function *(default "false")*
  - `suppress` - **Boolean** Suppress all routing error *(default "false")*
 
+in `functions` mode, it return an **Object** {user, password} otherwise, if some errors occurred, return **False**
+
 #### Examples
 
 Take a look at my [examples](https://github.com/hex7c0/basic-authentication/tree/master/examples)
