@@ -31,7 +31,13 @@ app.use(authentication({
 // express routing
 app.get('/',function(req,res) {
 
+    // authentication here
     res.send('hello world!');
+});
+app.get('/admin',authentication,function(req,res) {
+
+    // authentication here
+    res.send('authentication passed!');
 });
 // server starting
 app.listen(3000);

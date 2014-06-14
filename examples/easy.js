@@ -30,7 +30,13 @@ try {
 app.get('/',function(req,res) {
 
     var user = authentication(req);
-    res.send('hello ' + JSON.stringify(user));
+    if (user) {
+        // return 'admin' and 'password' (default value)
+        res.send('hello ' + user.user + ' ' + user.password);
+    } else {
+        // if browser doesn't send basic authentication header
+        res.send('nope');
+    }
 });
 // server starting
 app.listen(3000);

@@ -22,11 +22,14 @@ try {
 }
 
 /*
- * use only for "/admin" route
+ * callback use
  */
 // express routing
 app.get('/admin',authentication,function(req,res) {
 
+    // only for "/admin" route
+    // if user send wrong user/psw, module raise an error
+    // you can suppress with 'suppression' flag
     res.send('authentication passed!');
 });
 app.get('/',function(req,res) {
