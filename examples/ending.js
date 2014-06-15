@@ -1,6 +1,6 @@
 "use strict";
 /**
- * @file middleware example
+ * @file ending example
  * @package basic-authentication
  * @package basic-authentication
  * @subpackage examples
@@ -25,21 +25,22 @@ try {
  * using middleware for all routing
  */
 app.use(authentication({
-    password: 'foo',
-    agent: 'hello!',
-    suppress: true,
+    ending: false,
 }));
 
 // express routing
 app.get('/',function(req,res) {
 
-    // authentication here
     res.send('hello world!');
 });
 app.get('/admin',function(req,res) {
 
-    // authentication here
     res.send('authentication passed!');
+});
+// error handling
+app.use(function(err,req,res,next) {
+
+    res.send('error=' + err.message.toLowerCase());
 });
 // server starting
 app.listen(3000);

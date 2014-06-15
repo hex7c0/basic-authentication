@@ -4,7 +4,7 @@
  * @module basic-authentication
  * @package basic-authentication
  * @subpackage main
- * @version 1.0.1
+ * @version 1.0.2
  * @author hex7c0 <hex7c0@gmail.com>
  * @copyright hex7c0 2014
  * @license GPLv3
@@ -31,66 +31,6 @@ function error(next,code) {
     return next(new Error(code));
 }
 /**
- * protection middleware with basic authentication
- * 
- * @function big
- * @param {Object} req - client request
- * @param {Object} res - response to client
- * @param {next} [next] - continue routes
- * @return
- */
-function big(req,res,next) {
-
-    var auth = null;
-    var options = my;
-    if (auth = req.headers.authorization) {
-        auth = auth.split(' ');
-        if ('basic' == auth[0].toLowerCase() && auth[1]) {
-            auth = new Buffer(auth[1],'base64').toString();
-            auth = auth.match(/^([^:]+):(.+)$/);
-            if (auth) {
-                if (auth[1] != options.user || auth[2] != options.password) {
-                    res.setHeader('WWW-Authenticate','Basic realm="' + options.realm + '"');
-                    try {
-                        res.status(401).end('Unauthorized');
-                        return end(next,'unauthorized');
-                    } catch (TypeError) {
-                        res.statusCode = 401;
-                        return res.end('unauthorized');
-                    }
-                } else if (!options.agent) {
-                    try {
-                        return next();
-                    } catch (TypeError) {
-                        return;
-                    }
-                } else if (options.agent == req.headers['user-agent']) {
-                    try {
-                        return next();
-                    } catch (TypeError) {
-                        return;
-                    }
-                }
-                try {
-                    res.status(403).end('Forbidden');
-                    return end(next,'forbidden');
-                } catch (TypeError) {
-                    res.statusCode = 403;
-                    return res.end('forbidden');
-                }
-            }
-        }
-    }
-    res.setHeader('WWW-Authenticate','Basic realm="' + options.realm + '"');
-    try {
-        res.status(401).end('Unauthorized');
-        return;
-    } catch (TypeError) {
-        res.statusCode = 401;
-        return res.end('unauthorized');
-    }
-}
-/**
  * protection function with basic authentication
  * 
  * @function small
@@ -100,11 +40,6 @@ function big(req,res,next) {
 function small(req) {
 
     var auth = null;
-    try {
-        req = req.req || req;
-    } catch (e) {
-        return false;
-    }
     if (auth = req.headers.authorization) {
         auth = auth.split(' ');
         if ('basic' == auth[0].toLowerCase() && auth[1]) {
@@ -119,6 +54,103 @@ function small(req) {
         }
     }
     return false;
+}
+/**
+ * protection middleware with basic authentication
+ * 
+ * @function medium
+ * @param {Object} req - client request
+ * @param {Object} [res] - response to client
+ * @param {next} [next] - continue routes
+ * @return
+ */
+function medium(req,res,next) {
+
+    var options = my;
+    var auth = small(req);
+    if (auth) {
+        if (auth.user != options.user || auth.password != options.password) {
+            res.setHeader('WWW-Authenticate','Basic realm="' + options.realm + '"');
+            try {
+                return end(next,'unauthorized');
+            } catch (TypeError) {
+                return;
+            }
+        } else if (!options.agent) {
+            try {
+                return next();
+            } catch (TypeError) {
+                return;
+            }
+        } else if (options.agent == req.headers['user-agent']) {
+            try {
+                return next();
+            } catch (TypeError) {
+                return;
+            }
+        }
+        try {
+            return end(next,'forbidden');
+        } catch (TypeError) {
+            return;
+        }
+    }
+    res.setHeader('WWW-Authenticate','Basic realm="' + options.realm + '"');
+    res.statusCode = 401;
+    try {
+        return end(next,'unauthorized');
+    } catch (TypeError) {
+        return;
+    }
+}
+/**
+ * protection middleware with basic authentication and error handling
+ * 
+ * @function big
+ * @param {Object} req - client request
+ * @param {Object} [res] - response to client
+ * @param {next} [next] - continue routes
+ * @return
+ */
+function big(req,res,next) {
+
+    var options = my;
+    var auth = small(req);
+    if (auth) {
+        if (auth.user != options.user || auth.password != options.password) {
+            res.setHeader('WWW-Authenticate','Basic realm="' + options.realm + '"');
+            res.statusCode = 401;
+            res.end('Unauthorized');
+            try {
+                return end(next,'unauthorized');
+            } catch (TypeError) {
+                return;
+            }
+        } else if (!options.agent) {
+            try {
+                return next();
+            } catch (TypeError) {
+                return;
+            }
+        } else if (options.agent == req.headers['user-agent']) {
+            try {
+                return next();
+            } catch (TypeError) {
+                return;
+            }
+        }
+        res.statusCode = 403;
+        res.end('Forbidden');
+        try {
+            return end(next,'forbidden');
+        } catch (TypeError) {
+            return;
+        }
+    }
+    res.setHeader('WWW-Authenticate','Basic realm="' + options.realm + '"');
+    res.statusCode = 401;
+    res.end('Unauthorized');
+    return;
 }
 /**
  * setting options
@@ -137,15 +169,18 @@ module.exports = function(options) {
         agent: String(options.agent || ''),
         realm: String(options.realm || 'Authorization required'),
     }
-    if (Boolean(options.functions)) {
-        my = end = null;
-        return small;
-    }
     if (Boolean(options.suppress)) {
         end = function() {
 
             return;
         };
+    }
+    if (options.ending == false ? true : false) {
+        big = null;
+        return medium;
+    } else if (Boolean(options.functions)) {
+        my = end = medium = big = null;
+        return small;
     }
     return big;
 };
