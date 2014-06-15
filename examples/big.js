@@ -22,7 +22,7 @@ try {
 }
 
 /*
- * callback use
+ * use callback
  */
 // express routing
 app.get('/admin',authentication,function(req,res) {

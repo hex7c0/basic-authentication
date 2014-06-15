@@ -4,7 +4,7 @@
  * @module basic-authentication
  * @package basic-authentication
  * @subpackage main
- * @version 1.0.0
+ * @version 1.0.1
  * @author hex7c0 <hex7c0@gmail.com>
  * @copyright hex7c0 2014
  * @license GPLv3
@@ -36,8 +36,8 @@ function error(next,code) {
  * @function big
  * @param {Object} req - client request
  * @param {Object} res - response to client
- * @param {next} next - continue routes
- * @return {next}
+ * @param {next} [next] - continue routes
+ * @return
  */
 function big(req,res,next) {
 
@@ -51,22 +51,44 @@ function big(req,res,next) {
             if (auth) {
                 if (auth[1] != options.user || auth[2] != options.password) {
                     res.setHeader('WWW-Authenticate','Basic realm="' + options.realm + '"');
-                    res.status(401).end('Unauthorized');
-                    return end(next,'unauthorized');
+                    try {
+                        res.status(401).end('Unauthorized');
+                        return end(next,'unauthorized');
+                    } catch (TypeError) {
+                        res.statusCode = 401;
+                        return res.end('unauthorized');
+                    }
                 } else if (!options.agent) {
-                    return next();
+                    try {
+                        return next();
+                    } catch (TypeError) {
+                        return;
+                    }
                 } else if (options.agent == req.headers['user-agent']) {
-                    return next();
-                } else {
+                    try {
+                        return next();
+                    } catch (TypeError) {
+                        return;
+                    }
+                }
+                try {
                     res.status(403).end('Forbidden');
                     return end(next,'forbidden');
+                } catch (TypeError) {
+                    res.statusCode = 403;
+                    return res.end('forbidden');
                 }
             }
         }
     }
     res.setHeader('WWW-Authenticate','Basic realm="' + options.realm + '"');
-    res.status(401).end('Unauthorized');
-    return end(next,'unauthorized');
+    try {
+        res.status(401).end('Unauthorized');
+        return;
+    } catch (TypeError) {
+        res.statusCode = 401;
+        return res.end('unauthorized');
+    }
 }
 /**
  * protection function with basic authentication
