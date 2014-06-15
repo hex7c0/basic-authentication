@@ -21,7 +21,9 @@ try {
     process.exit(1);
 }
 
-// using middleware for all routing
+/*
+ * using middleware for all routing
+ */
 app.use(authentication({
     password: 'foo',
     agent: 'hello!',
