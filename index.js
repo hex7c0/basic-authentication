@@ -4,7 +4,7 @@
  * @module basic-authentication
  * @package basic-authentication
  * @subpackage main
- * @version 1.0.2
+ * @version 1.1.0
  * @author hex7c0 <hex7c0@gmail.com>
  * @copyright hex7c0 2014
  * @license GPLv3
@@ -13,7 +13,7 @@
 /*
  * initialize module
  */
-var my = {}, end = error;
+var my = Object.create(null);
 
 /*
  * functions
@@ -21,28 +21,29 @@ var my = {}, end = error;
 /**
  * end of work with error
  * 
- * @function normal
+ * @function end
  * @param {next} next - continue routes
  * @param {String} code - response to client
  * @return {next}
  */
-function error(next,code) {
+function end(next,code) {
 
     return next(new Error(code));
 }
 /**
  * protection function with basic authentication
  * 
- * @function small
+ * @deprecated
+ * @function old
  * @param {Object} req - client request
- * @return {Object|Boolean}
+ * @return {Object}
  */
-function small(req) {
+function old(req) {
 
     var auth = null;
     if (auth = req.headers.authorization) {
-        auth = auth.split(' ');
-        if ('basic' == auth[0].toLowerCase() && auth[1]) {
+        auth = auth.match(/^Basic (.+)$/);
+        if (auth[1]) {
             auth = new Buffer(auth[1],'base64').toString();
             auth = auth.match(/^([^:]+):(.+)$/);
             if (auth) {
@@ -53,7 +54,25 @@ function small(req) {
             }
         }
     }
-    return false;
+    return {};
+}
+/**
+ * protection function with basic authentication
+ * 
+ * @function small
+ * @param {Object} req - client request
+ * @return {String}
+ */
+function small(req) {
+
+    var auth = null;
+    if (auth = req.headers.authorization) {
+        auth = auth.match(/^Basic (.+)$/);
+        if (auth[1]) {
+            return auth[1];
+        }
+    }
+    return '';
 }
 /**
  * protection middleware with basic authentication
@@ -67,9 +86,9 @@ function small(req) {
 function medium(req,res,next) {
 
     var options = my;
-    var auth = small(req);
-    if (auth) {
-        if (auth.user != options.user || auth.password != options.password) {
+    var auth = null;
+    if (auth = small(req)) {
+        if (auth != options.hash) {
             res.setHeader('WWW-Authenticate','Basic realm="' + options.realm + '"');
             try {
                 return end(next,'unauthorized');
@@ -80,13 +99,13 @@ function medium(req,res,next) {
             try {
                 return next();
             } catch (TypeError) {
-                return;
+                return true;
             }
         } else if (options.agent == req.headers['user-agent']) {
             try {
                 return next();
             } catch (TypeError) {
-                return;
+                return true;
             }
         }
         try {
@@ -115,9 +134,9 @@ function medium(req,res,next) {
 function big(req,res,next) {
 
     var options = my;
-    var auth = small(req);
-    if (auth) {
-        if (auth.user != options.user || auth.password != options.password) {
+    var auth = null;
+    if (auth = small(req)) {
+        if (auth != options.hash) {
             res.setHeader('WWW-Authenticate','Basic realm="' + options.realm + '"');
             res.statusCode = 401;
             res.end('Unauthorized');
@@ -130,13 +149,13 @@ function big(req,res,next) {
             try {
                 return next();
             } catch (TypeError) {
-                return;
+                return true;
             }
         } else if (options.agent == req.headers['user-agent']) {
             try {
                 return next();
             } catch (TypeError) {
-                return;
+                return true;
             }
         }
         res.statusCode = 403;
@@ -163,12 +182,14 @@ function big(req,res,next) {
 module.exports = function(options) {
 
     var options = options || {};
+    var user = String(options.user || 'admin');
+    var password = String(options.password || 'password');
     my = {
-        user: String(options.user || 'admin'),
-        password: String(options.password || 'password'),
+        hash: new Buffer(user + ':' + password).toString('base64'),
         agent: String(options.agent || ''),
         realm: String(options.realm || 'Authorization required'),
     }
+
     if (Boolean(options.suppress)) {
         end = function() {
 
@@ -176,11 +197,15 @@ module.exports = function(options) {
         };
     }
     if (options.ending == false ? true : false) {
-        big = null;
+        old = big = null;
         return medium;
     } else if (Boolean(options.functions)) {
-        my = end = medium = big = null;
+        my = end = old = medium = big = null;
         return small;
+    } else if (Boolean(options.old)) {
+        my = end = small = medium = big = null;
+        return old;
     }
+    old = medium = null;
     return big;
 };
