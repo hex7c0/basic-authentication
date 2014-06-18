@@ -26,7 +26,10 @@ try {
  */
 http.createServer(function(req,res) {
 
-    authentication(req,res)
-    res.end('authentication passed!');
+    if (authentication(req,res)) {
+        res.end('authentication passed!');
+    } else {
+        res.end('nope!');
+    }
 }).listen(3000,'127.0.0.1');
 console.log('starting "hello world" on port 3000');

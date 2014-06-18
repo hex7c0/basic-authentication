@@ -15,7 +15,7 @@
 // import
 try {
     var authentication = require('../index.js')({
-        functions: true
+        old: true
     }); // use require('basic-authentication') instead
     var app = require('express')();
 } catch (MODULE_NOT_FOUND) {
