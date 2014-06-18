@@ -17,7 +17,7 @@
   },
   "dependencies": {},
   "devDependencies": {
-    "express": ">4.4.0"
+    "express": "4.X.X"
   },
   "engines": {
     "node": ">0.6.0"
