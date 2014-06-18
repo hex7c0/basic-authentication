@@ -13,7 +13,7 @@
 /*
  * initialize module
  */
-var my = Object.create(null);
+var my = null;
 
 /*
  * functions
