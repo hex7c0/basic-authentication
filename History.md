@@ -1,8 +1,13 @@
+v1.1.1 / 2014-06-18
+==================
+
+  * Doc updated
+
 v1.1.0 / 2014-06-18
 ==================
 
-  * slightly faster performance
-  * deprecated use of 'functions' with return Object
+  * Slightly faster performance
+  * Deprecated use of 'functions' with return Object
 
 v1.0.2 / 2014-06-15
 ==================

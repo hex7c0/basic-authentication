@@ -55,10 +55,12 @@ app.get('/',function(req,res) {
  - `realm` - **String** Realm for web authentication *(default "Authorization required")*
  - `ending` - **Boolean** Flag for send `res.end` after error or wrong password (not in "functions" mode) *(default "true")*
  - `functions` - **Boolean** Flag for using module like a function *(default "false")*
- - `old` - **Boolean** Flag for using module like a function that return an Object *(default "false")*
+ - `legacy` - **Boolean** Flag for using module like a function that return an Object *(default "false")*
  - `suppress` - **Boolean** Suppress all routing error *(default "false")*
 
-in `functions` mode, it return an **Object** {user, password} otherwise, if some errors occurred, return **False**
+in `functions` mode, it return a Base64 **String** otherwise, if some errors occurred, return an Empty **String**
+
+in `legacy` mode, it return an **Object** {user, password} otherwise, if some errors occurred, return an Empty **Object**
 
 #### Examples
 

@@ -4,7 +4,7 @@
  * @module basic-authentication
  * @package basic-authentication
  * @subpackage main
- * @version 1.1.0
+ * @version 1.1.1
  * @author hex7c0 <hex7c0@gmail.com>
  * @copyright hex7c0 2014
  * @license GPLv3
@@ -34,11 +34,11 @@ function end(next,code) {
  * protection function with basic authentication
  * 
  * @deprecated
- * @function old
+ * @function legacy
  * @param {Object} req - client request
  * @return {Object}
  */
-function old(req) {
+function legacy(req) {
 
     var auth = null;
     if (auth = req.headers.authorization) {
@@ -197,15 +197,15 @@ module.exports = function(options) {
         };
     }
     if (options.ending == false ? true : false) {
-        old = big = null;
+        legacy = big = null;
         return medium;
     } else if (Boolean(options.functions)) {
-        my = end = old = medium = big = null;
+        my = end = legacy = medium = big = null;
         return small;
-    } else if (Boolean(options.old)) {
+    } else if (Boolean(options.legacy)) {
         my = end = small = medium = big = null;
-        return old;
+        return legacy;
     }
-    old = medium = null;
+    legacy = medium = null;
     return big;
 };
