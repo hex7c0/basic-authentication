@@ -1,7 +1,7 @@
 "use strict";
 /**
  * @file big example
- * @package basic-authentication
+ * @module basic-authentication
  * @package basic-authentication
  * @subpackage examples
  * @version 0.0.1
