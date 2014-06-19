@@ -188,8 +188,7 @@ module.exports = function(options) {
         hash: new Buffer(user + ':' + password).toString('base64'),
         agent: String(options.agent || ''),
         realm: String(options.realm || 'Authorization required'),
-    }
-
+    };
     if (Boolean(options.suppress)) {
         end = function() {
 
