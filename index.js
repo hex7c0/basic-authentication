@@ -4,7 +4,7 @@
  * @module basic-authentication
  * @package basic-authentication
  * @subpackage main
- * @version 1.1.1
+ * @version 1.1.2
  * @author hex7c0 <hex7c0@gmail.com>
  * @copyright hex7c0 2014
  * @license GPLv3
@@ -89,7 +89,8 @@ function medium(req,res,next) {
     var auth = null;
     if (auth = small(req)) {
         if (auth != options.hash) {
-            res.setHeader('WWW-Authenticate','Basic realm="' + options.realm + '"');
+            res.setHeader('WWW-Authenticate','Basic realm="' + options.realm
+                    + '"');
             try {
                 return end(next,'unauthorized');
             } catch (TypeError) {
@@ -137,7 +138,8 @@ function big(req,res,next) {
     var auth = null;
     if (auth = small(req)) {
         if (auth != options.hash) {
-            res.setHeader('WWW-Authenticate','Basic realm="' + options.realm + '"');
+            res.setHeader('WWW-Authenticate','Basic realm="' + options.realm
+                    + '"');
             res.statusCode = 401;
             res.end('Unauthorized');
             try {
@@ -174,12 +176,12 @@ function big(req,res,next) {
 /**
  * setting options
  * 
- * @exports main
- * @function main
+ * @exports authentication
+ * @function authentication
  * @param {Object} options - various options. Check README.md
  * @return {Function}
  */
-module.exports = function(options) {
+module.exports = function authentication(options) {
 
     var options = options || {};
     var user = String(options.user || 'admin');
