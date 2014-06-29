@@ -1,7 +1,8 @@
-v1.1.2 / 2014-06-29
+v1.1.3 / 2014-06-29
 ==================
 
   * Remove anonymous function
+  * Update [`express`](https://github.com/visionmedia/express) @ 4.4.5
 
 v1.1.1 / 2014-06-18
 ==================

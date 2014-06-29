@@ -1,6 +1,6 @@
 #basic-authentication [![Build Status](https://travis-ci.org/hex7c0/basic-authentication.svg?branch=master)](https://travis-ci.org/hex7c0/basic-authentication) [![NPM version](https://badge.fury.io/js/basic-authentication.svg)](http://badge.fury.io/js/basic-authentication)
 
-method for a HTTP user agent to provide a user name and password when making a request for [nodejs](http://nodejs.org)
+is method for a HTTP user agent to provide a user name and password when making a request for [nodejs](http://nodejs.org)
 
 ## Installation
 
