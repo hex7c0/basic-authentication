@@ -1,3 +1,10 @@
+v1.2.0 / 2014-07-17
+==================
+
+  * Code rewrite
+  * Remove ugly parts
+  * Little improvement with RegExp
+
 v1.1.3 / 2014-06-29
 ==================
 

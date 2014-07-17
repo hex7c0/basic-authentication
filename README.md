@@ -53,7 +53,7 @@ app.get('/',function(req,res) {
  - `password` - **String** Password for web basic access authentication *(default "password")*
  - `agent` - **String** Browser User Agent for web authentication *(default "all accepted")*
  - `realm` - **String** Realm for web authentication *(default "Authorization required")*
- - `ending` - **Boolean** Flag for send `res.end` after error or wrong password (not in "functions" mode) *(default "true")*
+ - `ending` - **Boolean** Flag for send `res.end` (response) to client after error or wrong password (not in "functions" mode) *(default "true")*
  - `functions` - **Boolean** Flag for using module like a function *(default "false")*
  - `legacy` - **Boolean** Flag for using module like a function that return an Object *(default "false")*
  - `suppress` - **Boolean** Suppress all routing error *(default "false")*
