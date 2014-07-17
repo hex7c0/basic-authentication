@@ -4,7 +4,7 @@
  * @module basic-authentication
  * @package basic-authentication
  * @subpackage main
- * @version 1.1.3
+ * @version 1.1.4
  * @author hex7c0 <hex7c0@gmail.com>
  * @copyright hex7c0 2014
  * @license GPLv3
@@ -19,33 +19,69 @@ var my = null;
  * functions
  */
 /**
- * end of work with error
+ * end of error
  * 
- * @function end
+ * @function end_err
  * @param {next} next - continue routes
- * @param {String} code - response to client
- * @return {next}
+ * @param {String} code - response error
+ * @return {Error}
  */
-function end(next,code) {
+function end_err(next,code) {
 
     return next(new Error(code));
 }
+
 /**
- * protection function with basic authentication
+ * end of work
+ * 
+ * @function end_work
+ * @param {next} [next] - continue routes
+ * @param {String} [code] - response error
+ * @param {Object} [res] - response to client
+ * @return {next|Boolean}
+ */
+function end_work(next,code,res) {
+
+    if (code == undefined) { // success
+        try {
+            return next();
+        } catch (TypeError) {
+            return true;
+        }
+    } else { // error
+        if (typeof (res) == 'object') { // output
+            if (code == 'unauthorized') {
+                res.statusCode = 401;
+                res.end(code);
+            } else if (code == 'forbidden') {
+                res.statusCode = 403;
+                res.end(code);
+            }
+        }
+        try {
+            return end_err(next,code);
+        } catch (TypeError) {
+            return false;
+        }
+    }
+}
+
+/**
+ * protection function with basic authentication (deprecated)
  * 
  * @deprecated
- * @function legacy
+ * @function basic_legacy
  * @param {Object} req - client request
  * @return {Object}
  */
-function legacy(req) {
+function basic_legacy(req) {
 
     var auth = null;
     if (auth = req.headers.authorization) {
         auth = auth.match(/^Basic (.+)$/);
         if (auth[1]) {
             auth = new Buffer(auth[1],'base64').toString();
-            auth = auth.match(/^([^:]+):(.+)$/);
+            auth = auth.match(/^([^:]*):(.*)$/);
             if (auth) {
                 return {
                     user: auth[1],
@@ -56,14 +92,15 @@ function legacy(req) {
     }
     return {};
 }
+
 /**
  * protection function with basic authentication
  * 
- * @function small
+ * @function basic_small
  * @param {Object} req - client request
  * @return {String}
  */
-function small(req) {
+function basic_small(req) {
 
     var auth = null;
     if (auth = req.headers.authorization) {
@@ -74,105 +111,73 @@ function small(req) {
     }
     return '';
 }
+
 /**
- * protection middleware with basic authentication
+ * protection middleware with basic authentication without res.end
  * 
- * @function medium
+ * @function basic_medium
  * @param {Object} req - client request
- * @param {Object} [res] - response to client
+ * @param {Object} res - response to client
  * @param {next} [next] - continue routes
  * @return
  */
-function medium(req,res,next) {
+function basic_medium(req,res,next) {
 
     var options = my;
     var auth = null;
-    if (auth = small(req)) {
-        if (auth != options.hash) {
-            res.setHeader('WWW-Authenticate','Basic realm="' + options.realm
-                    + '"');
-            try {
-                return end(next,'unauthorized');
-            } catch (TypeError) {
-                return;
-            }
-        } else if (!options.agent) {
-            try {
-                return next();
-            } catch (TypeError) {
-                return true;
-            }
-        } else if (options.agent == req.headers['user-agent']) {
-            try {
-                return next();
-            } catch (TypeError) {
-                return true;
-            }
-        }
-        try {
-            return end(next,'forbidden');
-        } catch (TypeError) {
-            return;
-        }
-    }
-    res.setHeader('WWW-Authenticate','Basic realm="' + options.realm + '"');
-    res.statusCode = 401;
-    try {
-        return end(next,'unauthorized');
-    } catch (TypeError) {
-        return;
-    }
-}
-/**
- * protection middleware with basic authentication and error handling
- * 
- * @function big
- * @param {Object} req - client request
- * @param {Object} [res] - response to client
- * @param {next} [next] - continue routes
- * @return
- */
-function big(req,res,next) {
-
-    var options = my;
-    var auth = null;
-    if (auth = small(req)) {
+    if (auth = basic_small(req)) {
         if (auth != options.hash) {
             res.setHeader('WWW-Authenticate','Basic realm="' + options.realm
                     + '"');
             res.statusCode = 401;
-            res.end('Unauthorized');
-            try {
-                return end(next,'unauthorized');
-            } catch (TypeError) {
-                return;
-            }
+            return end_work(next,'unauthorized');
         } else if (!options.agent) {
-            try {
-                return next();
-            } catch (TypeError) {
-                return true;
-            }
+            return end_work(next);
         } else if (options.agent == req.headers['user-agent']) {
-            try {
-                return next();
-            } catch (TypeError) {
-                return true;
-            }
+            return end_work(next);
         }
         res.statusCode = 403;
-        res.end('Forbidden');
-        try {
-            return end(next,'forbidden');
-        } catch (TypeError) {
-            return;
-        }
+        return end_work(next,'forbidden');
     }
+    // first attempt
     res.setHeader('WWW-Authenticate','Basic realm="' + options.realm + '"');
     res.statusCode = 401;
-    res.end('Unauthorized');
+    res.end();
     return;
 }
+
+/**
+ * protection middleware with basic authentication and error handling
+ * 
+ * @function basic_big
+ * @param {Object} req - client request
+ * @param {Object} [res] - response to client
+ * @param {next} [next] - continue routes
+ * @return {Boolean}
+ */
+function basic_big(req,res,next) {
+
+    var options = my;
+    var auth = null;
+    if (auth = basic_small(req)) {
+        if (auth != options.hash) {
+            res.setHeader('WWW-Authenticate','Basic realm="' + options.realm
+                    + '"');
+            return end_work(next,'unauthorized',res);
+        } else if (!options.agent) {
+            return end_work(next);
+        } else if (options.agent == req.headers['user-agent']) {
+            return end_work(next);
+        }
+        return end_work(next,'forbidden',res);
+    }
+    // first attempt
+    res.setHeader('WWW-Authenticate','Basic realm="' + options.realm + '"');
+    res.statusCode = 401;
+    res.end('unauthorized');
+    return;
+}
+
 /**
  * setting options
  * 
@@ -192,21 +197,21 @@ module.exports = function authentication(options) {
         realm: String(options.realm || 'Authorization required'),
     };
     if (Boolean(options.suppress)) {
-        end = function() {
+        end_err = function() {
 
             return;
         };
     }
     if (options.ending == false ? true : false) {
-        legacy = big = null;
-        return medium;
+        basic_legacy = basic_big = null;
+        return basic_medium;
     } else if (Boolean(options.functions)) {
-        my = end = legacy = medium = big = null;
-        return small;
-    } else if (Boolean(options.legacy)) {
-        my = end = small = medium = big = null;
-        return legacy;
+        my = end_err = end_work = basic_legacy = basic_medium = basic_big = null;
+        return basic_small;
+    } else if (Boolean(options.basic_legacy)) {
+        my = end_err = end_work = basic_small = basic_medium = basic_big = null;
+        return basic_legacy;
     }
-    legacy = medium = null;
-    return big;
+    basic_legacy = basic_medium = null;
+    return basic_big;
 };
