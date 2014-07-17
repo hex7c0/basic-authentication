@@ -4,7 +4,7 @@
  * @module basic-authentication
  * @package basic-authentication
  * @subpackage main
- * @version 1.1.4
+ * @version 1.2.0
  * @author hex7c0 <hex7c0@gmail.com>
  * @copyright hex7c0 2014
  * @license GPLv3
@@ -14,6 +14,7 @@
  * initialize module
  */
 var my = null;
+var reg = new RegExp(/^Basic (.+)$/i);
 
 /*
  * functions
@@ -78,10 +79,10 @@ function basic_legacy(req) {
 
     var auth = null;
     if (auth = req.headers.authorization) {
-        auth = auth.match(/^Basic (.+)$/);
+        auth = auth.match(/^Basic (.+)$/i);
         if (auth[1]) {
             auth = new Buffer(auth[1],'base64').toString();
-            auth = auth.match(/^([^:]*):(.*)$/);
+            auth = auth.match(/^([^:]*):(.*)$/i);
             if (auth) {
                 return {
                     user: auth[1],
@@ -104,9 +105,8 @@ function basic_small(req) {
 
     var auth = null;
     if (auth = req.headers.authorization) {
-        auth = auth.match(/^Basic (.+)$/);
-        if (auth[1]) {
-            return auth[1];
+        if (reg.test(auth)) {
+            return auth.substring(6);
         }
     }
     return '';
