@@ -4,7 +4,7 @@
  * @module basic-authentication
  * @package basic-authentication
  * @subpackage main
- * @version 1.2.1
+ * @version 1.3.0
  * @author hex7c0 <hex7c0@gmail.com>
  * @copyright hex7c0 2014
  * @license GPLv3
@@ -16,6 +16,7 @@
 var my;
 var reg = new RegExp(/^Basic (.+)$/i);
 var http = require('http').STATUS_CODES;
+var crypto = require('crypto').createHash;
 
 /*
  * functions
@@ -70,39 +71,69 @@ function end_work(next,code,res) {
  * @function end_check
  * @param {String} auth - base64 request
  * @param {String} hash - user hash
- * @param {Boolean} file - read hash from file
  * @return {Boolean}
  */
-function end_check(auth,hash,file) {
+function end_check(auth,hash) {
 
-    if (file) {
-        // auth = require('crypto').createHash('sha1').update(auth).digest('hex');
-        // var readline = require('startline')({
-        // file: hash,
-        // });
-        // readline.on('line',function(line) {
-        //
-        // return auth != line;
-        // });
-        // QUA
-    }
     return auth != hash;
+}
+
+/**
+ * end check
+ * 
+ * @function end_check_file
+ * @param {String} auth - base64 request
+ * @param {String} hash - user hash
+ * @param {String} file - read hash from file
+ * @return {Boolean}
+ */
+function end_check_file(auth,hash,file) {
+
+    hash = crypto(hash);
+    var input = require('fs').readFileSync(file,{
+        encoding: 'utf8'
+    }).match(/(.+)/ig);
+    try {
+        var ii = input.length;
+    } catch (TypeError) {
+        var ii = 0;
+    }
+    var request = basic_legacy(auth,true);
+    var psw = hash.update(request.password).digest('hex');
+    request = new RegExp('^' + request.user + ':')
+    for (var i = 0; i < ii; i++) {
+        if (request.test(input[i])) {
+            var get = input[i].substring(request.source.length - 1);
+            if (get == psw) {
+                return false;
+            }
+        }
+    }
+    return true;
 }
 
 /**
  * protection function with basic authentication (deprecated)
  * 
- * @deprecated
  * @function basic_legacy
  * @param {Object} req - client request
+ * @param {Boolean} [force] - flag for forcing op
  * @return {Object}
  */
-function basic_legacy(req) {
+function basic_legacy(req,force) {
 
     var auth;
+    if (force) {
+        auth = new Buffer(req,'base64').toString();
+        auth = auth.match(/^([^:]*):(.*)$/i);
+        return {
+            user: auth[1],
+            password: auth[2]
+        };
+    }
     if (auth = req.headers.authorization) {
         auth = auth.match(/^Basic (.+)$/i);
-        if (auth[1]) {
+        if (auth && auth[1]) {
             auth = new Buffer(auth[1],'base64').toString();
             auth = auth.match(/^([^:]*):(.*)$/i);
             if (auth) {
@@ -113,7 +144,7 @@ function basic_legacy(req) {
             }
         }
     }
-    return {};
+    return Object.create(null);
 }
 
 /**
@@ -204,7 +235,7 @@ function basic_big(req,res,next) {
  */
 module.exports = function authentication(options) {
 
-    var options = options || {};
+    var options = options || Object.create(null);
     my = {
         file: Boolean(options.file),
         agent: String(options.agent || ''),
@@ -217,18 +248,21 @@ module.exports = function authentication(options) {
         };
     }
     if (my.file) {
-        my.hash = require('path').resolve(String(options.file));
-        if (!require('fs').existsSync(my.hash)) {
-            var err = my.hash + ' not exists';
+        my.hash = String(options.hash || 'md5');
+        my.file = require('path').resolve(String(options.file));
+        end_check = end_check_file;
+        if (!require('fs').existsSync(my.file)) {
+            var err = my.file + ' not exists';
             throw new Error(err);
         }
     } else {
         var user = String(options.user || 'admin');
         var password = String(options.password || 'password');
         my.hash = new Buffer(user + ':' + password).toString('base64');
+        end_check_file = null;
     }
     if (options.ending == false ? true : false) {
-        basic_legacy = basic_big = null;
+        basic_big = null;
         return basic_medium;
     } else if (Boolean(options.functions)) {
         my = end_err = end_work = basic_legacy = basic_medium = basic_big = null;
@@ -237,6 +271,6 @@ module.exports = function authentication(options) {
         my = end_err = end_work = basic_small = basic_medium = basic_big = null;
         return basic_legacy;
     }
-    basic_legacy = basic_medium = null;
+    basic_medium = null;
     return basic_big;
 };
