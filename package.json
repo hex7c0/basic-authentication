@@ -1,6 +1,6 @@
 {
   "name": "basic-authentication",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "basic authentication for nodejs",
   "main": "index.js",
   "repository": {
@@ -15,8 +15,11 @@
     "email": "hex7c0@gmail.com",
     "url": "http://hex7c0.tk/"
   },
-  "dependencies": {},
+  "dependencies": {
+    
+  },
   "devDependencies": {
+    "startline": "1.2.X",
     "express": "4.6.X"
   },
   "engines": {

@@ -218,7 +218,6 @@ module.exports = function authentication(options) {
     }
     if (my.file) {
         my.hash = require('path').resolve(String(options.file));
-        console.log(my.hash)
         if (!require('fs').existsSync(my.hash)) {
             var err = my.hash + ' not exists';
             throw new Error(err);
