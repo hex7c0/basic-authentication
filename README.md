@@ -51,6 +51,8 @@ app.get('/',function(req,res) {
 
  - `user` - **String** User for web basic access authentication *(default "admin")*
  - `password` - **String** Password for web basic access authentication *(default "password")*
+ - `file` - **String** Path of htpasswd file *(default "disabled")*
+ - `hash` - **String** Type of [hash](http://nodejs.org/api/crypto.html#crypto_crypto_createhash_algorithm) inside your htpasswd file *(default "md5")*
  - `agent` - **String** Browser User Agent for web authentication *(default "all accepted")*
  - `realm` - **String** Realm for web authentication *(default "Authorization required")*
  - `ending` - **Boolean** Flag for send `res.end` (response) to client after error or wrong password (not in "functions" mode) *(default "true")*
