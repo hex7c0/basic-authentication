@@ -2,6 +2,7 @@ v1.3.0 / 2014-07-21
 ==================
 
   * Ready for htpasswd file
+  * Add 'file' and 'hash' (options)
 
 v1.2.1 / 2014-07-20
 ==================
