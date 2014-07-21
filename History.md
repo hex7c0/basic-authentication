@@ -1,3 +1,9 @@
+v1.3.1 / 2014-07-21
+==================
+
+  * Remove case [insensitive](http://jsperf.com/case-sensitive-regex-vs-case-insensitive-regex)
+  * Best method for headers
+
 v1.3.0 / 2014-07-21
 ==================
 
