@@ -4,7 +4,7 @@
  * @module basic-authentication
  * @package basic-authentication
  * @subpackage main
- * @version 1.3.0
+ * @version 1.3.1
  * @author hex7c0 <hex7c0@gmail.com>
  * @copyright hex7c0 2014
  * @license GPLv3
@@ -54,7 +54,7 @@ function end_work(next,code,res) {
     } else { // error
         var codes = http[code];
         if (typeof (res) == 'object') { // output
-            res.statusCode = code;
+            res.writeHead(code);
             res.end(codes);
         }
         try {
@@ -182,15 +182,16 @@ function basic_medium(req,res,next) {
         if (end_check(auth,options.hash,options.file)) {
             res.setHeader('WWW-Authenticate','Basic realm="' + options.realm
                     + '"');
-            return end_work(next,res.statusCode = 401);
+            return end_work(next,401);
         } else if (!options.agent || options.agent == req.headers['user-agent']) {
             return end_work(next);
         }
-        return end_work(next,res.statusCode = 403);
+        return end_work(next,403);
     }
     // first attempt
-    res.setHeader('WWW-Authenticate','Basic realm="' + options.realm + '"');
-    res.statusCode = 401;
+    res.writeHead(401,{
+        'WWW-Authenticate': 'Basic realm="' + options.realm + '"',
+    });
     res.end();
     return;
 }
@@ -219,9 +220,10 @@ function basic_big(req,res,next) {
         return end_work(next,403,res);
     }
     // first attempt
-    res.setHeader('WWW-Authenticate','Basic realm="' + options.realm + '"');
-    res.statusCode = 401;
-    res.end('unauthorized');
+    res.writeHead(401,{
+        'WWW-Authenticate': 'Basic realm="' + options.realm + '"',
+    });
+    res.end(http[401]);
     return;
 }
 
