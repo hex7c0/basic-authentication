@@ -14,7 +14,7 @@
  * initialize module
  */
 var my;
-var reg = new RegExp(/^Basic (.+)$/i);
+var reg = new RegExp(/^Basic (.*)$/);
 var http = require('http').STATUS_CODES;
 var crypto = require('crypto').createHash;
 
@@ -92,7 +92,7 @@ function end_check_file(auth,hash,file) {
     hash = crypto(hash);
     var input = require('fs').readFileSync(file,{
         encoding: 'utf8'
-    }).match(/(.+)/ig);
+    }).match(/(.+)/g);
     try {
         var ii = input.length;
     } catch (TypeError) {
@@ -125,17 +125,17 @@ function basic_legacy(req,force) {
     var auth;
     if (force) {
         auth = new Buffer(req,'base64').toString();
-        auth = auth.match(/^([^:]*):(.*)$/i);
+        auth = auth.match(/^([^:]*):(.*)$/);
         return {
             user: auth[1],
             password: auth[2]
         };
     }
     if (auth = req.headers.authorization) {
-        auth = auth.match(/^Basic (.+)$/i);
+        auth = auth.match(reg);
         if (auth && auth[1]) {
             auth = new Buffer(auth[1],'base64').toString();
-            auth = auth.match(/^([^:]*):(.*)$/i);
+            auth = auth.match(/^([^:]*):(.*)$/);
             if (auth) {
                 return {
                     user: auth[1],
