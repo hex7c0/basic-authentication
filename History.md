@@ -1,3 +1,9 @@
+v1.3.3 / 2014-07-22
+==================
+
+  * Fix with multiple require
+  * Fix option.legacy
+
 v1.3.1 / 2014-07-21
 ==================
 

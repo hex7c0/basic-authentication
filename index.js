@@ -4,7 +4,7 @@
  * @module basic-authentication
  * @package basic-authentication
  * @subpackage main
- * @version 1.3.2
+ * @version 1.3.3
  * @author hex7c0 <hex7c0@gmail.com>
  * @copyright hex7c0 2014
  * @license GPLv3
@@ -51,17 +51,17 @@ function end_work(next,code,res) {
         } catch (TypeError) {
             return true;
         }
-    } else { // error
-        var codes = http[code];
-        if (typeof (res) == 'object') { // output
-            res.writeHead(code);
-            res.end(codes);
-        }
-        try {
-            return end_err(next,codes);
-        } catch (TypeError) {
-            return false;
-        }
+    }
+    // error
+    var codes = http[code];
+    if (typeof (res) == 'object') { // output
+        res.writeHead(code);
+        res.end(codes);
+    }
+    try {
+        return end_err(next,codes);
+    } catch (TypeError) {
+        return false;
     }
 }
 
@@ -89,18 +89,19 @@ function end_check(auth,hash) {
  */
 function end_check_file(auth,hash,file) {
 
-    hash = crypto(hash);
+    var hash = crypto(hash);
     var input = require('fs').readFileSync(file,{
         encoding: 'utf8'
     }).match(/(.+)/g);
+    var ii;
     try {
-        var ii = input.length;
+        ii = input.length;
     } catch (TypeError) {
-        var ii = 0;
+        ii = 0;
     }
     var request = basic_legacy(auth,true);
     var psw = hash.update(request.password).digest('hex');
-    request = new RegExp('^' + request.user + ':')
+    request = new RegExp('^' + request.user + ':');
     for (var i = 0; i < ii; i++) {
         if (request.test(input[i])) {
             var get = input[i].substring(request.source.length - 1);
@@ -123,7 +124,7 @@ function end_check_file(auth,hash,file) {
 function basic_legacy(req,force) {
 
     var auth;
-    if (force) {
+    if (force == true) {
         auth = new Buffer(req,'base64').toString();
         auth = auth.match(/^([^:]*):(.*)$/);
         return {
@@ -261,18 +262,15 @@ module.exports = function authentication(options) {
         var user = String(options.user || 'admin');
         var password = String(options.password || 'password');
         my.hash = new Buffer(user + ':' + password).toString('base64');
-        end_check_file = null;
     }
+
+    // return
     if (options.ending == false ? true : false) {
-        basic_big = null;
         return basic_medium;
     } else if (Boolean(options.functions)) {
-        my = end_err = end_work = basic_legacy = basic_medium = basic_big = null;
         return basic_small;
     } else if (Boolean(options.legacy)) {
-        my = end_err = end_work = basic_medium = basic_big = null;
         return basic_legacy;
     }
-    basic_medium = null;
     return basic_big;
 };
