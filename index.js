@@ -4,7 +4,7 @@
  * @module basic-authentication
  * @package basic-authentication
  * @subpackage main
- * @version 1.3.1
+ * @version 1.3.2
  * @author hex7c0 <hex7c0@gmail.com>
  * @copyright hex7c0 2014
  * @license GPLv3
@@ -269,8 +269,8 @@ module.exports = function authentication(options) {
     } else if (Boolean(options.functions)) {
         my = end_err = end_work = basic_legacy = basic_medium = basic_big = null;
         return basic_small;
-    } else if (Boolean(options.basic_legacy)) {
-        my = end_err = end_work = basic_small = basic_medium = basic_big = null;
+    } else if (Boolean(options.legacy)) {
+        my = end_err = end_work = basic_medium = basic_big = null;
         return basic_legacy;
     }
     basic_medium = null;

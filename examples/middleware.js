@@ -26,7 +26,7 @@ try {
  */
 app.use(authentication({
     password: 'foo',
-    agent: 'hello!',
+    // agent: 'hello!',
     suppress: true,
 }));
 
