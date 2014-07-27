@@ -14,7 +14,7 @@
  */
 // import
 try {
-    var authentication = require('../index.js'); // use require('basic-authentication') instead
+    var authentication = require('../index.min.js'); // use require('basic-authentication')
     var app = require('express')();
 } catch (MODULE_NOT_FOUND) {
     console.error(MODULE_NOT_FOUND);
@@ -22,7 +22,7 @@ try {
 }
 
 /*
- * using middleware for all routing
+ * using middleware none for all routing
  */
 app.use(authentication({
     ending: false,

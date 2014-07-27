@@ -1,6 +1,6 @@
 "use strict";
 /**
- * @file easy example
+ * @file legacy example
  * @module basic-authentication
  * @package basic-authentication
  * @subpackage examples
@@ -14,9 +14,7 @@
  */
 // import
 try {
-    var authentication = require('../index.js')({
-        old: true
-    }); // use require('basic-authentication') instead
+    var authentication = require('../index.min.js'); // use require('basic-authentication')
     var app = require('express')();
 } catch (MODULE_NOT_FOUND) {
     console.error(MODULE_NOT_FOUND);
@@ -26,16 +24,20 @@ try {
 /*
  * use like a function
  */
+authentication = authentication({
+    legacy: true
+}); // use require('basic-authentication') instead
+
 // express routing
 app.get('/',function(req,res) {
 
-    var user = authentication(req);
-    if (user) {
+    var auth = authentication(req);
+    if (auth.user || auth.password) {
         // return 'admin' and 'password' (default value)
-        res.send('hello ' + user.user + ' ' + user.password);
+        res.send('hello ' + auth.user + ' ' + auth.password);
     } else {
         // if browser doesn't send basic authentication header
-        res.send('nope');
+        res.status(401).send('nope');
     }
 });
 // server starting

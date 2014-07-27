@@ -1,6 +1,6 @@
 "use strict";
 /**
- * @file big example
+ * @file function example
  * @module basic-authentication
  * @package basic-authentication
  * @subpackage examples
@@ -14,7 +14,7 @@
  */
 // import
 try {
-    var authentication = require('../index.js')(); // use require('basic-authentication') instead
+    var authentication = require('../index.min.js'); // use require('basic-authentication')
     var app = require('express')();
 } catch (MODULE_NOT_FOUND) {
     console.error(MODULE_NOT_FOUND);
@@ -24,6 +24,8 @@ try {
 /*
  * use callback
  */
+authentication = authentication();
+
 // express routing
 app.get('/admin',authentication,function(req,res) {
 
