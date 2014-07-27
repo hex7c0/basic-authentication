@@ -1,6 +1,10 @@
-#basic-authentication [![Build Status](https://travis-ci.org/hex7c0/basic-authentication.svg?branch=master)](https://travis-ci.org/hex7c0/basic-authentication) [![NPM version](https://badge.fury.io/js/basic-authentication.svg)](http://badge.fury.io/js/basic-authentication)
+# [basic-authentication](https://github.com/hex7c0/basic-authentication)
+[![NPM version](https://badge.fury.io/js/basic-authentication.svg)](http://badge.fury.io/js/basic-authentication)
+[![Build Status](https://travis-ci.org/hex7c0/basic-authentication.svg?branch=master)](https://travis-ci.org/hex7c0/basic-authentication)
+[![devDependency Status](https://david-dm.org/hex7c0/basic-authentication/dev-status.svg)](https://david-dm.org/hex7c0/basic-authentication#info=devDependencies)
 
-is method for a HTTP user agent to provide a user name and password when making a request for [nodejs](http://nodejs.org)
+Basic authentication is method for a HTTP user agent to provide a user name and password.
+For [nodejs](http://nodejs.org)
 
 ## Installation
 
@@ -23,7 +27,6 @@ var app = require('express')();
 
 app.use(authentication);
 ```
-
 inside expressjs project with callback
 ```js
 var authentication = require('basic-authentication')();
@@ -33,7 +36,6 @@ app.get('/',authentication,function(req,res) {
     res.send('ok');
 });
 ```
-
 inside routing like a function
 ```js
 var authentication = require('basic-authentication')({functions: true});
@@ -46,7 +48,7 @@ app.get('/',function(req,res) {
 
 ### authentication(options)
 
-#### Options
+#### options
 
  - `user` - **String** User for web basic access authentication *(default "admin")*
  - `password` - **String** Password for web basic access authentication *(default "password")*
