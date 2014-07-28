@@ -24,7 +24,6 @@ var crypto = require('crypto').createHash;
  * empty function
  * 
  * @function end_empty
- * @return
  */
 function end_empty() {
 
@@ -232,7 +231,6 @@ module.exports = function authentication(options) {
          * @param {Object} req - client request
          * @param {Object} res - response to client
          * @param {next} [next] - continue routes
-         * @return
          */
         return function basic_medium(req,res,next) {
 
