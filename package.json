@@ -1,5 +1,5 @@
 {
-  "version": "1.5.0",
+  "version": "1.5.1",
   "name": "basic-authentication",
   "description": "basic authentication for nodejs",
   "keywords": [
@@ -9,7 +9,7 @@
     "authorization"
   ],
   "preferGlobal": false,
-  "homepage": "https://github.com/hex7c0/basic-authentication/",
+  "homepage": "http://supergiovane.tk/#/basic-authentication",
   "author": {
     "name": "hex7c0",
     "email": "hex7c0@gmail.com",
@@ -24,8 +24,7 @@
     "email": "hex7c0@gmail.com"
   },
   "directories":{
-    "doc":"./doc",
-    "lib":"./lib"
+    "doc":"./doc"
   },
   "main": "index.min.js",
   "dependencies": {
