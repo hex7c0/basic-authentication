@@ -1,7 +1,7 @@
 {
-  "version": "1.5.1",
+  "version": "1.5.2",
   "name": "basic-authentication",
-  "description": "basic authentication for nodejs",
+  "description": "http basic authentication",
   "keywords": [
     "basic",
     "basic-auth",
