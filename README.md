@@ -1,37 +1,34 @@
-# [basic-authentication](https://github.com/hex7c0/basic-authentication)
+# [basic-authentication](http://supergiovane.tk/#/basic-authentication)
+
 [![NPM version](https://badge.fury.io/js/basic-authentication.svg)](http://badge.fury.io/js/basic-authentication)
 [![Build Status](https://travis-ci.org/hex7c0/basic-authentication.svg?branch=master)](https://travis-ci.org/hex7c0/basic-authentication)
 [![devDependency Status](https://david-dm.org/hex7c0/basic-authentication/dev-status.svg)](https://david-dm.org/hex7c0/basic-authentication#info=devDependencies)
 
 Basic authentication is method for a HTTP user agent to provide a user name and password.
-For [nodejs](http://nodejs.org)
 
 ## Installation
 
 Install through NPM
 
-```
+```bash
 npm install basic-authentication
 ```
 or
-```
+```bash
 git clone git://github.com/hex7c0/basic-authentication.git
-```
-or
-```
-http://supergiovane.tk/#/basic-authentication
 ```
 
 ## API
 
-inside expressjs project with middleware
+inside expressjs project like a middleware
 ```js
 var authentication = require('basic-authentication')();
 var app = require('express')();
 
 app.use(authentication);
 ```
-inside expressjs project with callback
+
+inside expressjs project like a callback
 ```js
 var authentication = require('basic-authentication')();
 var app = require('express')();
@@ -40,6 +37,7 @@ app.get('/',authentication,function(req,res) {
     res.send('ok');
 });
 ```
+
 inside routing like a function
 ```js
 var authentication = require('basic-authentication')({functions: true});
@@ -69,11 +67,8 @@ in `functions` mode, it return a Base64 **String** otherwise, if some errors occ
 
 in `legacy` mode, it return an **Object** {user, password} otherwise, if some errors occurred, return an Empty **Object**
 
-#### Examples
+## Examples
 
 Take a look at my [examples](https://github.com/hex7c0/basic-authentication/tree/master/examples)
 
-## License
-Copyright (c) 2014 hex7c0
-
-Licensed under the GPLv3 license.
+### [License GPLv3](http://opensource.org/licenses/GPL-3.0)
