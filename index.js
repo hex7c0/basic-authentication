@@ -40,7 +40,10 @@ function end_empty() {
  */
 function end_err(next, code) {
 
-    return next(new Error(code));
+    if (next) {
+        return next(new Error(code));
+    }
+    return new Error(code);
 }
 var end_err_tmp = end_err;
 
@@ -56,11 +59,10 @@ var end_err_tmp = end_err;
 function end_work(next, code, res) {
 
     if (code === undefined) { // success
-        try {
+        if (next) {
             return next();
-        } catch (TypeError) {
-            return true;
         }
+        return true;
     }
     // error
     var codes = http[code];
@@ -68,11 +70,7 @@ function end_work(next, code, res) {
         res.writeHead(code);
         res.end(codes);
     }
-    try {
-        return end_err(next, codes);
-    } catch (TypeError) {
-        return false;
-    }
+    return end_err(next, codes);
 }
 
 /**
