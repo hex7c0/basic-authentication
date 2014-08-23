@@ -4,7 +4,7 @@
  * @module basic-authentication
  * @package basic-authentication
  * @subpackage main
- * @version 1.5.1
+ * @version 1.5.3
  * @author hex7c0 <hex7c0@gmail.com>
  * @copyright hex7c0 2014
  * @license GPLv3
@@ -38,7 +38,7 @@ function end_empty() {
  * @param {String} code - response error
  * @return {Error}
  */
-function end_err(next,code) {
+function end_err(next, code) {
 
     return next(new Error(code));
 }
@@ -53,9 +53,9 @@ var end_err_tmp = end_err;
  * @param {Object} [res] - response to client
  * @return {next|Boolean}
  */
-function end_work(next,code,res) {
+function end_work(next, code, res) {
 
-    if (code == undefined) { // success
+    if (code === undefined) { // success
         try {
             return next();
         } catch (TypeError) {
@@ -64,12 +64,12 @@ function end_work(next,code,res) {
     }
     // error
     var codes = http[code];
-    if (typeof (res) == 'object') { // output
+    if (res) { // output
         res.writeHead(code);
         res.end(codes);
     }
     try {
-        return end_err(next,codes);
+        return end_err(next, codes);
     } catch (TypeError) {
         return false;
     }
@@ -83,7 +83,7 @@ function end_work(next,code,res) {
  * @param {String} hash - user hash
  * @return {Boolean}
  */
-function end_check(auth,hash) {
+function end_check(auth, hash) {
 
     return auth != hash;
 }
@@ -98,10 +98,10 @@ var end_check_tmp = end_check;
  * @param {String} file - read hash from file
  * @return {Boolean}
  */
-function end_check_file(auth,hash,file) {
+function end_check_file(auth, hash, file) {
 
     var hash = crypto(hash);
-    var input = require('fs').readFileSync(file,{
+    var input = require('fs').readFileSync(file, {
         encoding: 'utf8',
     }).match(/(.+)/g);
     var ii;
@@ -110,13 +110,13 @@ function end_check_file(auth,hash,file) {
     } catch (TypeError) {
         ii = 0;
     }
-    var request = basic_legacy(auth,true);
+    var request = basic_legacy(auth, true);
     var psw = hash.update(request.password).digest('hex');
     request = new RegExp('^' + request.user + ':');
     for (var i = 0; i < ii; i++) {
         if (request.test(input[i])) {
             var get = input[i].substring(request.source.length - 1);
-            if (get == psw) {
+            if (get === psw) {
                 return false;
             }
         }
@@ -132,11 +132,11 @@ function end_check_file(auth,hash,file) {
  * @param {Boolean} [force] - flag for forcing op
  * @return {Object}
  */
-function basic_legacy(req,force) {
+function basic_legacy(req, force) {
 
     var auth;
-    if (force == true) {
-        auth = new Buffer(req,'base64').toString();
+    if (force === true) {
+        auth = new Buffer(req, 'base64').toString();
         auth = auth.match(/^([^:]*):(.*)$/);
         return {
             user: auth[1],
@@ -145,7 +145,7 @@ function basic_legacy(req,force) {
     }
     if (req.headers && (auth = req.headers.authorization)) {
         if ((auth = auth.match(reg)) && auth[1]) {
-            auth = new Buffer(auth[1],'base64').toString();
+            auth = new Buffer(auth[1], 'base64').toString();
             if (auth = auth.match(/^([^:]*):(.*)$/)) {
                 return {
                     user: auth[1],
@@ -208,9 +208,11 @@ module.exports = function authentication(options) {
     // return
     if (Boolean(options.legacy)) {
         return basic_legacy;
-    } else if (Boolean(options.functions)) {
+    }
+    if (Boolean(options.functions)) {
         return basic_small;
-    } else if (options.ending == false ? true : false) {
+    }
+    if (options.ending == false ? true : false) {
         return wrapper_medium();
     }
 
@@ -232,21 +234,22 @@ module.exports = function authentication(options) {
          * @param {Object} res - response to client
          * @param {next} [next] - continue routes
          */
-        return function basic_medium(req,res,next) {
+        return function basic_medium(req, res, next) {
 
             var auth;
             if (auth = basic_small(req)) {
-                if (end_check(auth,my.hash,my.file)) {
-                    res.setHeader('WWW-Authenticate','Basic realm="' + my.realm
-                            + '"');
-                    return end_work(next,401);
-                } else if (!my.agent || my.agent == req.headers['user-agent']) {
+                if (end_check(auth, my.hash, my.file)) {
+                    res.setHeader('WWW-Authenticate', 'Basic realm="'
+                            + my.realm + '"');
+                    return end_work(next, 401);
+                }
+                if (!my.agent || my.agent === req.headers['user-agent']) {
                     return end_work(next);
                 }
-                return end_work(next,403);
+                return end_work(next, 403);
             }
             // first attempt
-            res.writeHead(401,{
+            res.writeHead(401, {
                 'WWW-Authenticate': 'Basic realm="' + my.realm + '"',
             });
             res.end();
@@ -274,21 +277,22 @@ module.exports = function authentication(options) {
          * @param {next} [next] - continue routes
          * @return {Boolean}
          */
-        return function basic_big(req,res,next) {
+        return function basic_big(req, res, next) {
 
             var auth;
             if (auth = basic_small(req)) {
-                if (end_check(auth,my.hash,my.file)) {
-                    res.setHeader('WWW-Authenticate','Basic realm="' + my.realm
-                            + '"');
-                    return end_work(next,401,res);
-                } else if (!my.agent || my.agent == req.headers['user-agent']) {
+                if (end_check(auth, my.hash, my.file)) {
+                    res.setHeader('WWW-Authenticate', 'Basic realm="'
+                            + my.realm + '"');
+                    return end_work(next, 401, res);
+                }
+                if (!my.agent || my.agent === req.headers['user-agent']) {
                     return end_work(next);
                 }
-                return end_work(next,403,res);
+                return end_work(next, 403, res);
             }
             // first attempt
-            res.writeHead(401,{
+            res.writeHead(401, {
                 'WWW-Authenticate': 'Basic realm="' + my.realm + '"',
             });
             res.end(http[401]);
