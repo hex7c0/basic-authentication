@@ -2,7 +2,7 @@
 
 [![NPM version](https://badge.fury.io/js/basic-authentication.svg)](http://badge.fury.io/js/basic-authentication)
 [![Build Status](https://travis-ci.org/hex7c0/basic-authentication.svg?branch=master)](https://travis-ci.org/hex7c0/basic-authentication)
-[![devDependency Status](https://david-dm.org/hex7c0/basic-authentication/dev-status.svg)](https://david-dm.org/hex7c0/basic-authentication#info=devDependencies)
+[![Dependency Status](https://david-dm.org/hex7c0/basic-authentication/status.svg)](https://david-dm.org/hex7c0/basic-authentication)
 
 Basic authentication is method for a HTTP user agent to provide a user name and password.
 
