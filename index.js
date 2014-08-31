@@ -4,7 +4,7 @@
  * @module basic-authentication
  * @package basic-authentication
  * @subpackage main
- * @version 1.5.3
+ * @version 1.5.5
  * @author hex7c0 <hex7c0@gmail.com>
  * @copyright hex7c0 2014
  * @license GPLv3
@@ -103,9 +103,9 @@ function end_check_file(auth, hash, file) {
         encoding: 'utf8',
     }).match(/(.+)/g);
     var ii;
-    try {
+    if (input.length) {
         ii = input.length;
-    } catch (TypeError) {
+    } else {
         ii = 0;
     }
     var request = basic_legacy(auth, true);
@@ -237,8 +237,7 @@ module.exports = function authentication(options) {
             var auth;
             if (auth = basic_small(req)) {
                 if (end_check(auth, my.hash, my.file)) {
-                    res.setHeader('WWW-Authenticate', 'Basic realm="'
-                            + my.realm + '"');
+                    res.setHeader('WWW-Authenticate', 'Basic realm="' + my.realm + '"');
                     return end_work(next, 401);
                 }
                 if (!my.agent || my.agent === req.headers['user-agent']) {
@@ -280,8 +279,7 @@ module.exports = function authentication(options) {
             var auth;
             if (auth = basic_small(req)) {
                 if (end_check(auth, my.hash, my.file)) {
-                    res.setHeader('WWW-Authenticate', 'Basic realm="'
-                            + my.realm + '"');
+                    res.setHeader('WWW-Authenticate', 'Basic realm="' + my.realm + '"');
                     return end_work(next, 401, res);
                 }
                 if (!my.agent || my.agent === req.headers['user-agent']) {
