@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 /**
  * @file basic-authentication main
  * @module basic-authentication
