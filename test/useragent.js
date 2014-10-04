@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 /**
  * @file useragent test
  * @module basic-authentication
