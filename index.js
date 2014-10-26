@@ -98,7 +98,7 @@ var end_check_tmp = end_check;
  */
 function end_check_file(auth, hash, file) {
 
-    var hash = crypto(hash);
+    var hashes = crypto(hash);
     var input = require('fs').readFileSync(file, {
         encoding: 'utf8',
     }).match(/(.+)/g);
@@ -109,7 +109,7 @@ function end_check_file(auth, hash, file) {
         ii = 0;
     }
     var request = basic_legacy(auth, true);
-    var psw = hash.update(request.password).digest('hex');
+    var psw = hashes.update(request.password).digest('hex');
     request = new RegExp('^' + request.user + ':');
     for (var i = 0; i < ii; i++) {
         if (request.test(input[i])) {
@@ -143,8 +143,9 @@ function basic_legacy(req, force) {
     }
     if (req.headers && (auth = req.headers.authorization)) {
         if ((auth = auth.match(reg)) && auth[1]) {
-            auth = new Buffer(auth[1], 'base64').toString();
-            if (auth = auth.match(/^([^:]*):(.*)$/)) {
+            auth = new Buffer(auth[1], 'base64').toString()
+                    .match(/^([^:]*):(.*)$/);
+            if (auth) {
                 return {
                     user: auth[1],
                     password: auth[2]
@@ -178,12 +179,12 @@ function basic_small(req) {
  * 
  * @exports authentication
  * @function authentication
- * @param {Object} options - various options. Check README.md
+ * @param {Object} opt - various options. Check README.md
  * @return {Function}
  */
-module.exports = function authentication(options) {
+module.exports = function authentication(opt) {
 
-    var options = options || Object.create(null);
+    var options = opt || Object.create(null);
     var my = {
         file: Boolean(options.file),
         agent: String(options.agent || ''),
@@ -210,7 +211,7 @@ module.exports = function authentication(options) {
     if (Boolean(options.functions)) {
         return basic_small;
     }
-    if (options.ending == false ? true : false) {
+    if (options.ending === false ? true : false) {
         return wrapper_medium();
     }
 
@@ -234,10 +235,11 @@ module.exports = function authentication(options) {
          */
         return function basic_medium(req, res, next) {
 
-            var auth;
-            if (auth = basic_small(req)) {
+            var auth = basic_small(req);
+            if (auth) {
                 if (end_check(auth, my.hash, my.file)) {
-                    res.setHeader('WWW-Authenticate', 'Basic realm="' + my.realm + '"');
+                    res.setHeader('WWW-Authenticate', 'Basic realm="'
+                            + my.realm + '"');
                     return end_work(next, 401);
                 }
                 if (!my.agent || my.agent === req.headers['user-agent']) {
@@ -276,10 +278,11 @@ module.exports = function authentication(options) {
          */
         return function basic_big(req, res, next) {
 
-            var auth;
-            if (auth = basic_small(req)) {
+            var auth = basic_small(req);
+            if (auth) {
                 if (end_check(auth, my.hash, my.file)) {
-                    res.setHeader('WWW-Authenticate', 'Basic realm="' + my.realm + '"');
+                    res.setHeader('WWW-Authenticate', 'Basic realm="'
+                            + my.realm + '"');
                     return end_work(next, 401, res);
                 }
                 if (!my.agent || my.agent === req.headers['user-agent']) {
