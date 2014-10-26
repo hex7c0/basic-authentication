@@ -182,7 +182,7 @@ function basic_small(req) {
  * @param {Object} opt - various options. Check README.md
  * @return {Function}
  */
-module.exports = function authentication(opt) {
+function authentication(opt) {
 
     var options = opt || Object.create(null);
     var my = {
@@ -298,4 +298,5 @@ module.exports = function authentication(opt) {
             return;
         };
     }
-};
+}
+module.exports = authentication;
