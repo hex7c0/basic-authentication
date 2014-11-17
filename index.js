@@ -192,6 +192,11 @@ function authentication(opt) {
     realm: String(options.realm || 'Authorization required'),
     suppress: Boolean(options.suppress),
   };
+  my.realms = 'Basic realm="' + my.realm + '"';
+  my.realm = {
+    'WWW-Authenticate': my.realms,
+  };
+
   if (my.file) {
     my.hash = String(options.hash || 'md5');
     my.file = require('path').resolve(String(options.file));
@@ -239,7 +244,7 @@ function authentication(opt) {
       var auth = basic_small(req);
       if (auth !== '') {
         if (check(auth, my.hash, my.file) === true) {
-          setHeader(res, 'WWW-Authenticate', 'Basic realm="' + my.realm + '"', true);
+          setHeader(res, 'WWW-Authenticate', my.realms, true);
           return end_work(err, next, 401);
         }
         if (my.agent === '' || my.agent === req.headers['user-agent']) {
@@ -248,9 +253,7 @@ function authentication(opt) {
         return end_work(err, next, 403);
       }
       // first attempt
-      res.writeHead(401, {
-        'WWW-Authenticate': 'Basic realm="' + my.realm + '"',
-      });
+      res.writeHead(401, my.realm);
       return res.end();
     };
   }
@@ -281,7 +284,7 @@ function authentication(opt) {
       var auth = basic_small(req);
       if (auth !== '') {
         if (check(auth, my.hash, my.file) === true) {
-          setHeader(res, 'WWW-Authenticate', 'Basic realm="' + my.realm + '"', true);
+          setHeader(res, 'WWW-Authenticate', my.realms, true);
           return end_work(err, next, 401, res);
         }
         if (my.agent === '' || my.agent === req.headers['user-agent']) {
@@ -290,9 +293,7 @@ function authentication(opt) {
         return end_work(err, next, 403, res);
       }
       // first attempt
-      res.writeHead(401, {
-        'WWW-Authenticate': 'Basic realm="' + my.realm + '"',
-      });
+      res.writeHead(401, my.realm);
       return res.end(http[401]);
     };
   }
