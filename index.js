@@ -40,10 +40,7 @@ function end_empty() {
  */
 function end_err(next, code) {
 
-  if (next) {
-    return next(new Error(code));
-  }
-  return new Error(code);
+  return next !== undefined ? next(new Error(code)) : new Error(code);
 }
 var end_err_tmp = end_err;
 
@@ -59,14 +56,11 @@ var end_err_tmp = end_err;
 function end_work(next, code, res) {
 
   if (code === undefined) { // success
-    if (next) {
-      return next();
-    }
-    return true;
+    return next !== undefined ? next() : true;
   }
   // error
   var codes = http[code];
-  if (res) { // output
+  if (res !== undefined) { // output
     res.writeHead(code);
     res.end(codes);
   }
@@ -83,7 +77,7 @@ function end_work(next, code, res) {
  */
 function end_check(auth, hash) {
 
-  return auth != hash;
+  return auth !== hash;
 }
 var end_check_tmp = end_check;
 
@@ -125,6 +119,7 @@ function end_check_file(auth, hash, file) {
 /**
  * protection function with basic authentication (deprecated)
  * 
+ * @deprecated
  * @function basic_legacy
  * @param {Object} req - client request
  * @param {Boolean} [force] - flag for forcing op
@@ -141,10 +136,11 @@ function basic_legacy(req, force) {
       password: auth[2]
     };
   }
-  if (req.headers && (auth = req.headers.authorization)) {
-    if ((auth = auth.match(reg)) && auth[1]) {
+  if (req.headers !== undefined
+      && (auth = req.headers.authorization) !== undefined) {
+    if ((auth = auth.match(reg)) && auth[1] !== undefined) {
       auth = new Buffer(auth[1], 'base64').toString().match(/^([^:]*):(.*)$/);
-      if (auth) {
+      if (auth !== undefined) {
         return {
           user: auth[1],
           password: auth[2]
