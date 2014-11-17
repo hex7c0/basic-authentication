@@ -4,7 +4,7 @@
  * @module basic-authentication
  * @package basic-authentication
  * @subpackage main
- * @version 1.5.5
+ * @version 1.5.0
  * @author hex7c0 <hex7c0@gmail.com>
  * @copyright hex7c0 2014
  * @license GPLv3
@@ -13,9 +13,15 @@
 /*
  * initialize module
  */
-var reg = new RegExp(/^Basic (.*)$/);
-var http = require('http').STATUS_CODES;
-var crypto = require('crypto').createHash;
+try {
+  var reg = new RegExp(/^Basic (.*)$/);
+  var http = require('http').STATUS_CODES;
+  var crypto = require('crypto').createHash;
+  var setHeader = require('setheaders');
+} catch (MODULE_NOT_FOUND) {
+  console.error(MODULE_NOT_FOUND);
+  process.exit(1);
+}
 
 /*
  * functions
@@ -233,7 +239,7 @@ function authentication(opt) {
       var auth = basic_small(req);
       if (auth !== '') {
         if (check(auth, my.hash, my.file) === true) {
-          res.setHeader('WWW-Authenticate', 'Basic realm="' + my.realm + '"');
+          setHeader(res, 'WWW-Authenticate', 'Basic realm="' + my.realm + '"', true);
           return end_work(err, next, 401);
         }
         if (my.agent === '' || my.agent === req.headers['user-agent']) {
@@ -275,7 +281,7 @@ function authentication(opt) {
       var auth = basic_small(req);
       if (auth !== '') {
         if (check(auth, my.hash, my.file) === true) {
-          res.setHeader('WWW-Authenticate', 'Basic realm="' + my.realm + '"');
+          setHeader(res, 'WWW-Authenticate', 'Basic realm="' + my.realm + '"', true);
           return end_work(err, next, 401, res);
         }
         if (my.agent === '' || my.agent === req.headers['user-agent']) {

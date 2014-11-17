@@ -25,6 +25,7 @@
   },
   "main": "index.min.js",
   "dependencies": {
+    "setheaders": "0.0.2"
   },
   "devDependencies": {
     "cookie-parser": "~1.3",
