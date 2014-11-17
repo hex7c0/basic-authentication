@@ -161,8 +161,9 @@ function basic_legacy(req, force) {
 function basic_small(req) {
 
   var auth;
-  if (req.headers && (auth = req.headers.authorization)) {
-    if (reg.test(auth)) {
+  if (req.headers !== undefined
+      && (auth = req.headers.authorization) !== undefined) {
+    if (reg.test(auth) === true) {
       return auth.substring(6);
     }
   }
