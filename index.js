@@ -210,17 +210,12 @@ function authentication(opt) {
     my.hash = new Buffer(user + ':' + password).toString('base64');
   }
 
-  // return
-  if (Boolean(options.legacy)) {
-    return basic_legacy;
-  }
-  if (Boolean(options.functions)) {
-    return basic_small;
-  }
-  if (options.ending === false ? true : false) {
-    return wrapper_medium();
-  }
-
+  /**
+   * wrapper for medium function
+   * 
+   * @function wrapper_medium
+   * @return {Function}
+   */
   function wrapper_medium() {
 
     var check = end_check;
@@ -231,6 +226,7 @@ function authentication(opt) {
     if (my.suppress) {
       err = end_empty;
     }
+
     /**
      * protection middleware with basic authentication without res.end
      * 
@@ -258,7 +254,12 @@ function authentication(opt) {
     };
   }
 
-  return wrapper_big();
+  /**
+   * wrapper for big function
+   * 
+   * @function wrapper_big
+   * @return {Function}
+   */
   function wrapper_big() {
 
     var check = end_check;
@@ -297,5 +298,17 @@ function authentication(opt) {
       return res.end(http[401]);
     };
   }
+
+  // return
+  if (Boolean(options.legacy)) {
+    return basic_legacy;
+  }
+  if (Boolean(options.functions)) {
+    return basic_small;
+  }
+  if (options.ending === false ? true : false) {
+    return wrapper_medium();
+  }
+  return wrapper_big();
 }
 module.exports = authentication;
