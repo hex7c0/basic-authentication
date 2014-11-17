@@ -27,7 +27,7 @@ var crypto = require('crypto').createHash;
  */
 function end_empty() {
 
-    return;
+  return;
 }
 
 /**
@@ -40,10 +40,10 @@ function end_empty() {
  */
 function end_err(next, code) {
 
-    if (next) {
-        return next(new Error(code));
-    }
-    return new Error(code);
+  if (next) {
+    return next(new Error(code));
+  }
+  return new Error(code);
 }
 var end_err_tmp = end_err;
 
@@ -58,19 +58,19 @@ var end_err_tmp = end_err;
  */
 function end_work(next, code, res) {
 
-    if (code === undefined) { // success
-        if (next) {
-            return next();
-        }
-        return true;
+  if (code === undefined) { // success
+    if (next) {
+      return next();
     }
-    // error
-    var codes = http[code];
-    if (res) { // output
-        res.writeHead(code);
-        res.end(codes);
-    }
-    return end_err(next, codes);
+    return true;
+  }
+  // error
+  var codes = http[code];
+  if (res) { // output
+    res.writeHead(code);
+    res.end(codes);
+  }
+  return end_err(next, codes);
 }
 
 /**
@@ -83,7 +83,7 @@ function end_work(next, code, res) {
  */
 function end_check(auth, hash) {
 
-    return auth != hash;
+  return auth != hash;
 }
 var end_check_tmp = end_check;
 
@@ -98,28 +98,28 @@ var end_check_tmp = end_check;
  */
 function end_check_file(auth, hash, file) {
 
-    var hashes = crypto(hash);
-    var input = require('fs').readFileSync(file, {
-        encoding: 'utf8',
-    }).match(/(.+)/g);
-    var ii;
-    if (input.length) {
-        ii = input.length;
-    } else {
-        ii = 0;
+  var hashes = crypto(hash);
+  var input = require('fs').readFileSync(file, {
+    encoding: 'utf8',
+  }).match(/(.+)/g);
+  var ii;
+  if (input.length) {
+    ii = input.length;
+  } else {
+    ii = 0;
+  }
+  var request = basic_legacy(auth, true);
+  var psw = hashes.update(request.password).digest('hex');
+  request = new RegExp('^' + request.user + ':');
+  for (var i = 0; i < ii; i++) {
+    if (request.test(input[i])) {
+      var get = input[i].substring(request.source.length - 1);
+      if (get === psw) {
+        return false;
+      }
     }
-    var request = basic_legacy(auth, true);
-    var psw = hashes.update(request.password).digest('hex');
-    request = new RegExp('^' + request.user + ':');
-    for (var i = 0; i < ii; i++) {
-        if (request.test(input[i])) {
-            var get = input[i].substring(request.source.length - 1);
-            if (get === psw) {
-                return false;
-            }
-        }
-    }
-    return true;
+  }
+  return true;
 }
 
 /**
@@ -132,28 +132,27 @@ function end_check_file(auth, hash, file) {
  */
 function basic_legacy(req, force) {
 
-    var auth;
-    if (force === true) {
-        auth = new Buffer(req, 'base64').toString();
-        auth = auth.match(/^([^:]*):(.*)$/);
+  var auth;
+  if (force === true) {
+    auth = new Buffer(req, 'base64').toString();
+    auth = auth.match(/^([^:]*):(.*)$/);
+    return {
+      user: auth[1],
+      password: auth[2]
+    };
+  }
+  if (req.headers && (auth = req.headers.authorization)) {
+    if ((auth = auth.match(reg)) && auth[1]) {
+      auth = new Buffer(auth[1], 'base64').toString().match(/^([^:]*):(.*)$/);
+      if (auth) {
         return {
-            user: auth[1],
-            password: auth[2]
+          user: auth[1],
+          password: auth[2]
         };
+      }
     }
-    if (req.headers && (auth = req.headers.authorization)) {
-        if ((auth = auth.match(reg)) && auth[1]) {
-            auth = new Buffer(auth[1], 'base64').toString()
-                    .match(/^([^:]*):(.*)$/);
-            if (auth) {
-                return {
-                    user: auth[1],
-                    password: auth[2]
-                };
-            }
-        }
-    }
-    return Object.create(null);
+  }
+  return Object.create(null);
 }
 
 /**
@@ -165,13 +164,13 @@ function basic_legacy(req, force) {
  */
 function basic_small(req) {
 
-    var auth;
-    if (req.headers && (auth = req.headers.authorization)) {
-        if (reg.test(auth)) {
-            return auth.substring(6);
-        }
+  var auth;
+  if (req.headers && (auth = req.headers.authorization)) {
+    if (reg.test(auth)) {
+      return auth.substring(6);
     }
-    return '';
+  }
+  return '';
 }
 
 /**
@@ -184,119 +183,117 @@ function basic_small(req) {
  */
 function authentication(opt) {
 
-    var options = opt || Object.create(null);
-    var my = {
-        file: Boolean(options.file),
-        agent: String(options.agent || ''),
-        realm: String(options.realm || 'Authorization required'),
-        suppress: Boolean(options.suppress),
-    };
+  var options = opt || Object.create(null);
+  var my = {
+    file: Boolean(options.file),
+    agent: String(options.agent || ''),
+    realm: String(options.realm || 'Authorization required'),
+    suppress: Boolean(options.suppress),
+  };
+  if (my.file) {
+    my.hash = String(options.hash || 'md5');
+    my.file = require('path').resolve(String(options.file));
+    if (!require('fs').existsSync(my.file)) {
+      var err = my.file + ' not exists';
+      throw new Error(err);
+    }
+  } else {
+    var user = String(options.user || 'admin');
+    var password = String(options.password || 'password');
+    my.hash = new Buffer(user + ':' + password).toString('base64');
+  }
+
+  // return
+  if (Boolean(options.legacy)) {
+    return basic_legacy;
+  }
+  if (Boolean(options.functions)) {
+    return basic_small;
+  }
+  if (options.ending === false ? true : false) {
+    return wrapper_medium();
+  }
+
+  function wrapper_medium() {
+
+    end_check = end_check_tmp;
     if (my.file) {
-        my.hash = String(options.hash || 'md5');
-        my.file = require('path').resolve(String(options.file));
-        if (!require('fs').existsSync(my.file)) {
-            var err = my.file + ' not exists';
-            throw new Error(err);
+      end_check = end_check_file;
+    }
+    end_err = end_err_tmp;
+    if (my.suppress) {
+      end_err = end_empty;
+    }
+    /**
+     * protection middleware with basic authentication without res.end
+     * 
+     * @function basic_medium
+     * @param {Object} req - client request
+     * @param {Object} res - response to client
+     * @param {next} [next] - continue routes
+     */
+    return function basic_medium(req, res, next) {
+
+      var auth = basic_small(req);
+      if (auth) {
+        if (end_check(auth, my.hash, my.file)) {
+          res.setHeader('WWW-Authenticate', 'Basic realm="' + my.realm + '"');
+          return end_work(next, 401);
         }
-    } else {
-        var user = String(options.user || 'admin');
-        var password = String(options.password || 'password');
-        my.hash = new Buffer(user + ':' + password).toString('base64');
-    }
-
-    // return
-    if (Boolean(options.legacy)) {
-        return basic_legacy;
-    }
-    if (Boolean(options.functions)) {
-        return basic_small;
-    }
-    if (options.ending === false ? true : false) {
-        return wrapper_medium();
-    }
-
-    function wrapper_medium() {
-
-        end_check = end_check_tmp;
-        if (my.file) {
-            end_check = end_check_file;
+        if (!my.agent || my.agent === req.headers['user-agent']) {
+          return end_work(next);
         }
-        end_err = end_err_tmp;
-        if (my.suppress) {
-            end_err = end_empty;
-        }
-        /**
-         * protection middleware with basic authentication without res.end
-         * 
-         * @function basic_medium
-         * @param {Object} req - client request
-         * @param {Object} res - response to client
-         * @param {next} [next] - continue routes
-         */
-        return function basic_medium(req, res, next) {
+        return end_work(next, 403);
+      }
+      // first attempt
+      res.writeHead(401, {
+        'WWW-Authenticate': 'Basic realm="' + my.realm + '"',
+      });
+      res.end();
+      return;
+    };
+  }
 
-            var auth = basic_small(req);
-            if (auth) {
-                if (end_check(auth, my.hash, my.file)) {
-                    res.setHeader('WWW-Authenticate', 'Basic realm="'
-                            + my.realm + '"');
-                    return end_work(next, 401);
-                }
-                if (!my.agent || my.agent === req.headers['user-agent']) {
-                    return end_work(next);
-                }
-                return end_work(next, 403);
-            }
-            // first attempt
-            res.writeHead(401, {
-                'WWW-Authenticate': 'Basic realm="' + my.realm + '"',
-            });
-            res.end();
-            return;
-        };
+  return wrapper_big();
+  function wrapper_big() {
+
+    end_check = end_check_tmp;
+    if (my.file) {
+      end_check = end_check_file;
     }
-
-    return wrapper_big();
-    function wrapper_big() {
-
-        end_check = end_check_tmp;
-        if (my.file) {
-            end_check = end_check_file;
-        }
-        end_err = end_err_tmp;
-        if (my.suppress) {
-            end_err = end_empty;
-        }
-        /**
-         * protection middleware with basic authentication and error handling
-         * 
-         * @function basic_big
-         * @param {Object} req - client request
-         * @param {Object} res - response to client
-         * @param {next} [next] - continue routes
-         * @return {Boolean}
-         */
-        return function basic_big(req, res, next) {
-
-            var auth = basic_small(req);
-            if (auth) {
-                if (end_check(auth, my.hash, my.file)) {
-                    res.setHeader('WWW-Authenticate', 'Basic realm="'
-                            + my.realm + '"');
-                    return end_work(next, 401, res);
-                }
-                if (!my.agent || my.agent === req.headers['user-agent']) {
-                    return end_work(next);
-                }
-                return end_work(next, 403, res);
-            }
-            // first attempt
-            res.writeHead(401, {
-                'WWW-Authenticate': 'Basic realm="' + my.realm + '"',
-            });
-            res.end(http[401]);
-            return;
-        };
+    end_err = end_err_tmp;
+    if (my.suppress) {
+      end_err = end_empty;
     }
+    /**
+     * protection middleware with basic authentication and error handling
+     * 
+     * @function basic_big
+     * @param {Object} req - client request
+     * @param {Object} res - response to client
+     * @param {next} [next] - continue routes
+     * @return {Boolean}
+     */
+    return function basic_big(req, res, next) {
+
+      var auth = basic_small(req);
+      if (auth) {
+        if (end_check(auth, my.hash, my.file)) {
+          res.setHeader('WWW-Authenticate', 'Basic realm="' + my.realm + '"');
+          return end_work(next, 401, res);
+        }
+        if (!my.agent || my.agent === req.headers['user-agent']) {
+          return end_work(next);
+        }
+        return end_work(next, 403, res);
+      }
+      // first attempt
+      res.writeHead(401, {
+        'WWW-Authenticate': 'Basic realm="' + my.realm + '"',
+      });
+      res.end(http[401]);
+      return;
+    };
+  }
 }
 module.exports = authentication;
