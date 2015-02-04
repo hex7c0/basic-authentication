@@ -13,15 +13,14 @@
 /*
  * initialize module
  */
-try {
-  var reg = new RegExp(/^Basic (.*)$/);
-  var http = require('http').STATUS_CODES;
-  var crypto = require('crypto').createHash;
-  var setHeader = require('setheaders');
-} catch (MODULE_NOT_FOUND) {
-  console.error(MODULE_NOT_FOUND);
-  process.exit(1);
-}
+// import
+var http = require('http').STATUS_CODES;
+var crypto = require('crypto').createHash;
+var setHeader = require('setheaders');
+// regexp
+var reg = new RegExp(/^Basic (.*)$/);
+var basic = new RegExp(/^([^:]*):(.*)$/);
+var end = new RegExp(/(.+)/g);
 
 /*
  * functions
@@ -100,7 +99,7 @@ function end_check_file(auth, hash, file) {
   var hashes = crypto(hash);
   var input = require('fs').readFileSync(file, {
     encoding: 'utf8',
-  }).match(/(.+)/g);
+  }).match(end);
   var ii;
   if (input.length) {
     ii = input.length;
@@ -135,16 +134,16 @@ function basic_legacy(req, force) {
   var auth;
   if (force === true) {
     auth = new Buffer(req, 'base64').toString();
-    auth = auth.match(/^([^:]*):(.*)$/);
+    auth = auth.match(basic);
     return {
       user: auth[1],
       password: auth[2]
     };
   }
   if (req.headers !== undefined
-      && (auth = req.headers.authorization) !== undefined) {
+    && (auth = req.headers.authorization) !== undefined) {
     if ((auth = auth.match(reg)) && auth[1] !== undefined) {
-      auth = new Buffer(auth[1], 'base64').toString().match(/^([^:]*):(.*)$/);
+      auth = new Buffer(auth[1], 'base64').toString().match(basic);
       if (auth !== undefined) {
         return {
           user: auth[1],
@@ -167,7 +166,7 @@ function basic_small(req) {
 
   var auth;
   if (req.headers !== undefined
-      && (auth = req.headers.authorization) !== undefined) {
+    && (auth = req.headers.authorization) !== undefined) {
     if (reg.test(auth) === true) {
       return auth.substring(6);
     }
@@ -302,11 +301,9 @@ function authentication(opt) {
   // return
   if (Boolean(options.legacy)) {
     return basic_legacy;
-  }
-  if (Boolean(options.functions)) {
+  } else if (Boolean(options.functions)) {
     return basic_small;
-  }
-  if (options.ending === false ? true : false) {
+  } else if (options.ending === false ? true : false) {
     return wrapper_medium();
   }
   return wrapper_big();
