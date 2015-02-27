@@ -2,7 +2,6 @@
 /**
  * @file basic-authentication main
  * @module basic-authentication
- * @package basic-authentication
  * @subpackage main
  * @version 1.5.0
  * @author hex7c0 <hex7c0@gmail.com>
@@ -16,7 +15,7 @@
 // import
 var http = require('http').STATUS_CODES;
 var crypto = require('crypto').createHash;
-var setHeader = require('setheaders');
+var setHeader = require('setheaders').setWritableHeader;
 // regexp
 var reg = new RegExp(/^Basic (.*)$/);
 var basic = new RegExp(/^([^:]*):(.*)$/);
@@ -239,8 +238,10 @@ function authentication(opt) {
       var auth = basic_small(req);
       if (auth !== '') {
         if (check(auth, my.hash, my.file) === true) {
-          setHeader(res, 'WWW-Authenticate', my.realms, true);
-          return end_work(err, next, 401);
+          if (setHeader(res, 'WWW-Authenticate', my.realms)) {
+            end_work(err, next, 401);
+          }
+          return;
         }
         if (my.agent === '' || my.agent === req.headers['user-agent']) {
           return end_work(err, next);
@@ -284,8 +285,10 @@ function authentication(opt) {
       var auth = basic_small(req);
       if (auth !== '') {
         if (check(auth, my.hash, my.file) === true) {
-          setHeader(res, 'WWW-Authenticate', my.realms, true);
-          return end_work(err, next, 401, res);
+          if (setHeader(res, 'WWW-Authenticate', my.realms)) {
+            end_work(err, next, 401, res);
+          }
+          return;
         }
         if (my.agent === '' || my.agent === req.headers['user-agent']) {
           return end_work(err, next);
