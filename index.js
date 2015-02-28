@@ -108,7 +108,12 @@ function end_check_file(auth, hash, file) {
   } else {
     ii = 0;
   }
+
   var request = basic_legacy(auth, true);
+  if (!request.user || !request.password) { // empty field
+    return true;
+  }
+
   var psw = hashes.update(request.password).digest('hex');
   request = new RegExp('^' + request.user + ':');
   for (var i = 0; i < ii; i++) {
@@ -136,12 +141,15 @@ function basic_legacy(req, force) {
   var auth;
   if (force === true) {
     auth = new Buffer(req, 'base64').toString('utf8');
-    auth = auth.match(basic);
-    return {
-      user: auth[1],
-      password: auth[2]
-    };
+    if ((auth = auth.match(basic)) && auth[1]) {
+      return {
+        user: auth[1],
+        password: auth[2]
+      };
+    }
+    return Object.create(null);
   }
+
   if (req.headers && (auth = req.headers.authorization)) {
     if ((auth = auth.match(reg)) && auth[1]) {
       auth = new Buffer(auth[1], 'base64').toString('utf8').match(basic);

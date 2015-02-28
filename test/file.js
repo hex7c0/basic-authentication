@@ -12,92 +12,103 @@
 /*
  * initialize module
  */
-// import
-try {
-    var authentication = require('../index.min.js'); // use require('basic-authentication')
-    var app = require('express')();
-    var request = require('supertest');
-} catch (MODULE_NOT_FOUND) {
-    console.error(MODULE_NOT_FOUND);
-    process.exit(1);
-}
+var authentication = require('..');
+var app = require('express')();
+var request = require('supertest');
 
 /*
  * test module
  */
-describe('file',function() {
+describe('file', function() {
 
-    before(function(done) {
+  before(function(done) {
 
-        app.use(authentication({
-            hash: 'sha1',
-            file: __dirname + '/../examples/htpasswd',
-            suppress: true,
-        }));
-        app.get('/',function(req,res) {
+    app.use(authentication({
+      hash: 'sha1',
+      file: __dirname + '/../examples/htpasswd',
+      suppress: true
+    })).get('/', function(req, res) {
 
-            res.send('hello world!');
-        });
-        done();
+      res.send('hello world!');
     });
+    done();
+  });
 
-    it('correct1 - should return 200 status code',function(done) {
+  it('should return pippo1 200', function(done) {
 
-        var p = 'Basic ' + new Buffer('pippo1:pippo').toString('base64');
-        request(app).get('/').set('Authorization',p).expect(200,done);
+    var p = 'Basic ' + new Buffer('pippo1:pippo').toString('base64');
+    request(app).get('/').set('Authorization', p).expect(200, done);
+  });
+  it('should return pippo2 200', function(done) {
+
+    var p = 'Basic ' + new Buffer('pippo2:pippo').toString('base64');
+    request(app).get('/').set('Authorization', p).expect(200, done);
+  });
+  it('should return pippo3 200', function(done) {
+
+    var p = 'Basic ' + new Buffer('pippo3:pippo').toString('base64');
+    request(app).get('/').set('Authorization', p).expect(200, done);
+  });
+  it('should return pippo4 200', function(done) {
+
+    var p = 'Basic ' + new Buffer('pippo4:pippo').toString('base64');
+    request(app).get('/').set('Authorization', p).expect(200, done);
+  });
+
+  describe('header', function() {
+
+    it('should return 401, because no header', function(done) {
+
+      request(app).get('/').expect(401, done);
     });
+    it('should return 401, because wrong header', function(done) {
 
-    it('correct4 - should return 200 status code',function(done) {
-
-        var p = 'Basic ' + new Buffer('pippo4:pippo').toString('base64');
-        request(app).get('/').set('Authorization',p).expect(200,done);
+      var p = 'Basic ' + new Buffer('admin:foo').toString('base64');
+      request(app).get('/').set('AuthorizatioFoo', p).expect(401, done);
     });
+    it('should return 401, because wrong string', function(done) {
 
-    it('no header - should return 401 status code',function(done) {
-
-        request(app).get('/').expect(401,done);
+      var p = 'Foo ' + new Buffer('admin:password').toString('base64');
+      request(app).get('/').set('Authorization', p).expect(401, done);
     });
+  });
 
-    describe('credential',function() {
+  describe('credential', function() {
 
-        it('wrong psw - should return 401 status code',function(done) {
+    it('should return 401, because no encoded string', function(done) {
 
-            var p = 'Basic ' + new Buffer('admin:pippo').toString('base64');
-            request(app).get('/').set('Authorization',p).expect(401,done);
-        });
-
-        it('empty psw - should return 401 status code',function(done) {
-
-            var p = 'Basic ' + new Buffer('admin:').toString('base64');
-            request(app).get('/').set('Authorization',p).expect(401,done);
-        });
-
-        it('empty id - should return 401 status code',function(done) {
-
-            var p = 'Basic ' + new Buffer(':foo').toString('base64');
-            request(app).get('/').set('Authorization',p).expect(401,done);
-        });
-
-        it('empty both - should return 401 status code',function(done) {
-
-            var p = 'Basic ' + new Buffer(':').toString('base64');
-            request(app).get('/').set('Authorization',p).expect(401,done);
-        });
+      var p = 'Basic admin:password';
+      request(app).get('/').set('Authorization', p).expect(401, done);
     });
+    it('should return 401, because wrong id', function(done) {
 
-    describe('malformed',function() {
-
-        it('header - should return 401 status code',function(done) {
-
-            var p = 'Basic ' + new Buffer('admin:foo').toString('base64');
-            request(app).get('/').set('Authorizatio',p).expect(401,done);
-        });
-
-        it('basic - should return 401 status code',function(done) {
-
-            var p = 'Basic: ' + new Buffer('admin:foo').toString('base64');
-            request(app).get('/').set('Authorization',p).expect(401,done);
-        });
+      var p = 'Basic ' + new Buffer('pippo:password').toString('base64');
+      request(app).get('/').set('Authorization', p).expect(401, done);
     });
+    it('should return 401 , because empty id', function(done) {
 
+      var p = 'Basic ' + new Buffer(':password').toString('base64');
+      request(app).get('/').set('Authorization', p).expect(401, done);
+    });
+    it('should return 401, because wrong psw', function(done) {
+
+      var p = 'Basic ' + new Buffer('admin:pippo').toString('base64');
+      request(app).get('/').set('Authorization', p).expect(401, done);
+    });
+    it('should return 401, because empty psw', function(done) {
+
+      var p = 'Basic ' + new Buffer('admin:').toString('base64');
+      request(app).get('/').set('Authorization', p).expect(401, done);
+    });
+    it('should return 401, because both wrong', function(done) {
+
+      var p = 'Basic ' + new Buffer('foo:foo').toString('base64');
+      request(app).get('/').set('Authorization', p).expect(401, done);
+    });
+    it('should return 401, because both empty', function(done) {
+
+      var p = 'Basic ' + new Buffer(':').toString('base64');
+      request(app).get('/').set('Authorization', p).expect(401, done);
+    });
+  });
 });
