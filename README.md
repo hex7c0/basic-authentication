@@ -4,6 +4,7 @@
 [![Linux Status](https://img.shields.io/travis/hex7c0/basic-authentication.svg?label=linux)](https://travis-ci.org/hex7c0/basic-authentication)
 [![Windows Status](https://img.shields.io/appveyor/ci/hex7c0/basic-authentication.svg?label=windows)](https://ci.appveyor.com/project/hex7c0/basic-authentication)
 [![Dependency Status](https://img.shields.io/david/hex7c0/basic-authentication.svg)](https://david-dm.org/hex7c0/basic-authentication)
+[![Coveralls](https://img.shields.io/coveralls/hex7c0/basic-authentication.svg)](https://coveralls.io/r/hex7c0/basic-authentication)
 
 Basic authentication is method for a HTTP user agent to provide a user name and password.
 
@@ -24,28 +25,33 @@ git clone git://github.com/hex7c0/basic-authentication.git
 inside expressjs project like a middleware
 ```js
 var authentication = require('basic-authentication')();
-var app = require('express')();
 
+var app = require('express')();
 app.use(authentication);
 ```
-
-inside expressjs project like a callback
+inside expressjs project like a callback for certain route
 ```js
 var authentication = require('basic-authentication')();
-var app = require('express')();
 
-app.get('/',authentication,function(req,res) {
+var app = require('express')();
+app.get('/', authentication, function(req, res) {
+
     res.send('ok');
 });
 ```
-
 inside routing like a function
 ```js
 var authentication = require('basic-authentication')({functions: true});
-var app = require('express')();
 
-app.get('/',function(req,res) {
+var app = require('express')();
+app.get('/', function(req, res) {
+
     var user = authentication(req);
+    if (user == 'foo') {
+        res.send('ok');
+    } else {
+        res.send('ko');
+    }
 });
 ```
 
@@ -64,9 +70,9 @@ app.get('/',function(req,res) {
  - `legacy` - **Boolean** Flag for using module like a function that return an Object *(default "false")*
  - `suppress` - **Boolean** Suppress all routing error *(default "false")*
 
-in `functions` mode, it return a Base64 **String** otherwise, if some errors occurred, return an Empty **String**
+in `functions` mode, it return a Base64 **String**; otherwise, if some errors occurred, return an Empty **String**
 
-in `legacy` mode, it return an **Object** {user, password} otherwise, if some errors occurred, return an Empty **Object**
+in `legacy` mode, it return an **Object** `{user, password}`; otherwise, if some errors occurred, return an Empty **Object**
 
 ## Examples
 
