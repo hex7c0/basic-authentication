@@ -125,7 +125,7 @@ function end_check_file(auth, hash, file) {
  * 
  * @deprecated
  * @function basic_legacy
- * @param {Object} req - client request
+ * @param {Object|String} req - client request or check this string with force flag
  * @param {Boolean} [force] - flag for forcing op
  * @return {Object}
  */
@@ -133,18 +133,17 @@ function basic_legacy(req, force) {
 
   var auth;
   if (force === true) {
-    auth = new Buffer(req, 'base64').toString();
+    auth = new Buffer(req, 'base64').toString('utf8');
     auth = auth.match(basic);
     return {
       user: auth[1],
       password: auth[2]
     };
   }
-  if (req.headers !== undefined
-    && (auth = req.headers.authorization) !== undefined) {
-    if ((auth = auth.match(reg)) && auth[1] !== undefined) {
-      auth = new Buffer(auth[1], 'base64').toString().match(basic);
-      if (auth !== undefined) {
+  if (req.headers && (auth = req.headers.authorization)) {
+    if ((auth = auth.match(reg)) && auth[1]) {
+      auth = new Buffer(auth[1], 'base64').toString('utf8').match(basic);
+      if (auth) {
         return {
           user: auth[1],
           password: auth[2]
@@ -184,6 +183,13 @@ function basic_small(req) {
 function authentication(opt) {
 
   var options = opt || Object.create(null);
+
+  if (Boolean(options.legacy)) {
+    return basic_legacy;
+  } else if (Boolean(options.functions)) {
+    return basic_small;
+  }
+
   var my = {
     file: Boolean(options.file),
     agent: String(options.agent || ''),
@@ -302,11 +308,7 @@ function authentication(opt) {
   }
 
   // return
-  if (Boolean(options.legacy)) {
-    return basic_legacy;
-  } else if (Boolean(options.functions)) {
-    return basic_small;
-  } else if (options.ending === false) {
+  if (options.ending === false) {
     return wrapper_medium();
   }
   return wrapper_big();
