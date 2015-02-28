@@ -1,8 +1,7 @@
 'use strict';
 /**
- * @file legacy example
+ * @file example with functions branch
  * @module basic-authentication
- * @package basic-authentication
  * @subpackage examples
  * @version 0.0.1
  * @author hex7c0 <hex7c0@gmail.com>
@@ -12,22 +11,20 @@
 /*
  * initialize module
  */
+// import
 var authentication = require('..'); // use require('basic-authentication') instead
 var app = require('express')();
 
-/*
- * use like a function
- */
+// using like middleware for all routing
 var auth = authentication({
-  legacy: true
+  functions: true, // return a function
 });
 
 // express routing
 app.get('/', function(req, res) {
 
-  var found = auth(req);
-  // return 'admin' and 'password' (default value)
-  res.send('hello ' + found.user + ':' + found.password);
+  var encodedString = auth(req);
+  res.send('get this string: ' + encodedString);
 });
 
 // server starting

@@ -1,6 +1,6 @@
 'use strict';
 /**
- * @file example with .htpasswd file
+ * @file example without close connection with client, and throw an Error
  * @module basic-authentication
  * @subpackage examples
  * @version 0.0.1
@@ -15,20 +15,24 @@
 var authentication = require('..'); // use require('basic-authentication') instead
 var app = require('express')();
 
-/*
- * using file middleware for all routing
- */
+// using like middleware for all routing
 app.use(authentication({
-  hash: 'sha1',
-  file: 'htpasswd',
-  suppress: true, // suppress throwing Error if wrong user
+  ending: false, // throw an error if wrong
 }));
 
 // express routing
 app.get('/', function(req, res) {
 
-  // authentication here
-  res.send('hello world!');
+  res.send('authentication passed! /');
+}).get('/admin', function(req, res) {
+
+  res.send('authentication passed! /admin');
+});
+
+// error handling
+app.use(function(err, req, res, next) {
+
+  res.send('error=' + err.message.toLowerCase()); // should print "error=unauthorized" if I'm wrong password
 });
 
 // server starting

@@ -1,8 +1,7 @@
 'use strict';
 /**
- * @file legacy example
+ * @file callback for only 1 route
  * @module basic-authentication
- * @package basic-authentication
  * @subpackage examples
  * @version 0.0.1
  * @author hex7c0 <hex7c0@gmail.com>
@@ -12,25 +11,28 @@
 /*
  * initialize module
  */
+// import
 var authentication = require('..'); // use require('basic-authentication') instead
 var app = require('express')();
 
 /*
- * use like a function
+ * use callback
  */
-var auth = authentication({
-  legacy: true
-});
+var auth = authentication();
 
 // express routing
-app.get('/', function(req, res) {
+app.get('/admin', auth, function(req, res) {
 
-  var found = auth(req);
-  // return 'admin' and 'password' (default value)
-  res.send('hello ' + found.user + ':' + found.password);
+  // only for "/admin" route
+  // if user send wrong user/psw, module raise an error
+  // you can suppress with 'suppression' flag
+
+  res.send('with auth');
+}).get('/', function(req, res) {
+
+  res.send('without auth');
 });
 
 // server starting
 app.listen(3000);
 console.log('starting "hello world" on port 3000');
-// manually popolate Authorization header
