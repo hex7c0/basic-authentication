@@ -35,7 +35,7 @@ function end_empty() {
 }
 
 /**
- * end with error
+ * end with error. Propagate Error to callback
  * 
  * @function end_err
  * @param {next} next - continue routes
@@ -60,16 +60,18 @@ function end_err(next, code) {
  */
 function end_work(err, next, code, res) {
 
-  if (code === undefined) { // success
-    return next !== undefined ? next() : true;
+  if (!code) { // success
+    return next ? next() : true;
   }
-  // error
-  var codes = http[code];
-  if (res !== undefined) { // output
+
+  var codes = http[code]; // error
+
+  if (res) { // basic_big
     res.writeHead(code);
     res.end(codes);
   }
-  return err(next, codes);
+
+  return err(next, codes); // basic_medium
 }
 
 /**
@@ -194,13 +196,15 @@ function authentication(opt) {
     file: Boolean(options.file),
     agent: String(options.agent || ''),
     realm: String(options.realm || 'Authorization required'),
-    suppress: Boolean(options.suppress),
+    suppress: Boolean(options.suppress)
   };
   my.realms = 'Basic realm="' + my.realm + '"';
   my.realm = {
-    'WWW-Authenticate': my.realms,
+    'WWW-Authenticate': my.realms
   };
 
+  // user
+  var check;
   if (my.file) {
     my.hash = String(options.hash || 'md5');
     my.file = require('path').resolve(String(options.file));
@@ -208,109 +212,86 @@ function authentication(opt) {
       var err = my.file + ' not exists';
       throw new Error(err);
     }
+
+    check = end_check_file;
+
   } else {
     var user = String(options.user || 'admin');
     var password = String(options.password || 'password');
     my.hash = new Buffer(user + ':' + password).toString('base64');
+
+    check = end_check;
+  }
+
+  // error handler
+  var err = end_err;
+  if (my.suppress) {
+    err = end_empty;
   }
 
   /**
-   * wrapper for medium function
+   * protection middleware with basic authentication without res.end
    * 
-   * @function wrapper_medium
-   * @return {Function}
+   * @function basic_medium
+   * @param {Object} req - client request
+   * @param {Object} res - response to client
+   * @param {next} [next] - continue routes
    */
-  function wrapper_medium() {
+  function basic_medium(req, res, next) {
 
-    var check = end_check;
-    if (my.file) {
-      check = end_check_file;
-    }
-    var err = end_err;
-    if (my.suppress) {
-      err = end_empty;
-    }
-
-    /**
-     * protection middleware with basic authentication without res.end
-     * 
-     * @function basic_medium
-     * @param {Object} req - client request
-     * @param {Object} res - response to client
-     * @param {next} [next] - continue routes
-     */
-    return function basic_medium(req, res, next) {
-
-      var auth = basic_small(req);
-      if (auth !== '') {
-        if (check(auth, my.hash, my.file) === true) {
-          if (setHeader(res, 'WWW-Authenticate', my.realms)) {
-            end_work(err, next, 401);
-          }
-          return;
-        }
-        if (my.agent === '' || my.agent === req.headers['user-agent']) {
-          return end_work(err, next);
-        }
-        return end_work(err, next, 403);
+    var auth = basic_small(req);
+    if (auth !== '') {
+      if (check(auth, my.hash, my.file) === true) { // check if different
+        return setHeader(res, 'WWW-Authenticate', my.realms) === true
+          ? end_work(err, next, 401) : null;
       }
-      // first attempt
-      res.writeHead(401, my.realm);
-      return res.end();
-    };
+
+      if (my.agent === '' || my.agent === req.headers['user-agent']) { // check UA
+        return end_work(err, next);
+      }
+
+      return end_work(err, next, 403);
+    }
+
+    // first attempt
+    res.writeHead(401, my.realm);
+    return res.end();
   }
 
   /**
-   * wrapper for big function
+   * protection middleware with basic authentication and error handling
    * 
-   * @function wrapper_big
-   * @return {Function}
+   * @function basic_big
+   * @param {Object} req - client request
+   * @param {Object} res - response to client
+   * @param {next} [next] - continue routes
+   * @return {Boolean}
    */
-  function wrapper_big() {
+  function basic_big(req, res, next) {
 
-    var check = end_check;
-    if (my.file) {
-      check = end_check_file;
-    }
-    var err = end_err;
-    if (my.suppress) {
-      err = end_empty;
-    }
-
-    /**
-     * protection middleware with basic authentication and error handling
-     * 
-     * @function basic_big
-     * @param {Object} req - client request
-     * @param {Object} res - response to client
-     * @param {next} [next] - continue routes
-     * @return {Boolean}
-     */
-    return function basic_big(req, res, next) {
-
-      var auth = basic_small(req);
-      if (auth !== '') {
-        if (check(auth, my.hash, my.file) === true) {
-          if (setHeader(res, 'WWW-Authenticate', my.realms)) {
-            end_work(err, next, 401, res);
-          }
-          return;
-        }
-        if (my.agent === '' || my.agent === req.headers['user-agent']) {
-          return end_work(err, next);
-        }
-        return end_work(err, next, 403, res);
+    var auth = basic_small(req);
+    if (auth !== '') {
+      if (check(auth, my.hash, my.file) === true) { // check if different
+        return setHeader(res, 'WWW-Authenticate', my.realms) === true
+          ? end_work(err, next, 401, res) : null;
       }
-      // first attempt
-      res.writeHead(401, my.realm);
-      return res.end(http[401]);
-    };
+
+      if (my.agent === '' || my.agent === req.headers['user-agent']) { // check UA
+        return end_work(err, next);
+      }
+
+      return end_work(err, next, 403, res);
+    }
+
+    // first attempt
+    res.writeHead(401, my.realm);
+    return res.end(http[401]);
   }
 
   // return
   if (options.ending === false) {
-    return wrapper_medium();
+    return basic_medium;
   }
-  return wrapper_big();
+  return basic_big;
 }
 module.exports = authentication;
