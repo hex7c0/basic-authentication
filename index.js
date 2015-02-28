@@ -35,7 +35,7 @@ function end_empty() {
 }
 
 /**
- * end of error
+ * end with error
  * 
  * @function end_err
  * @param {next} next - continue routes
@@ -44,7 +44,8 @@ function end_empty() {
  */
 function end_err(next, code) {
 
-  return next !== undefined ? next(new Error(code)) : new Error(code);
+  var err = new Error(code);
+  return next ? next(err) : err;
 }
 
 /**
@@ -155,7 +156,7 @@ function basic_legacy(req, force) {
 }
 
 /**
- * protection function with basic authentication
+ * check existence of basic authentication header. Return this string without "Basic "
  * 
  * @function basic_small
  * @param {Object} req - client request
@@ -164,10 +165,9 @@ function basic_legacy(req, force) {
 function basic_small(req) {
 
   var auth;
-  if (req.headers !== undefined
-    && (auth = req.headers.authorization) !== undefined) {
-    if (reg.test(auth) === true) {
-      return auth.substring(6);
+  if (req.headers && (auth = req.headers.authorization)) {
+    if (reg.test(auth) === true) { // test basic header
+      return auth.substring(6); // return Base64 string without "Basic "
     }
   }
   return '';
@@ -306,7 +306,7 @@ function authentication(opt) {
     return basic_legacy;
   } else if (Boolean(options.functions)) {
     return basic_small;
-  } else if (options.ending === false ? true : false) {
+  } else if (options.ending === false) {
     return wrapper_medium();
   }
   return wrapper_big();
