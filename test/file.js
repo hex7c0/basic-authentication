@@ -85,7 +85,7 @@ describe('file', function() {
       var p = 'Basic ' + new Buffer('pippo:password').toString('base64');
       request(app).get('/').set('Authorization', p).expect(401, done);
     });
-    it('should return 401 , because empty id', function(done) {
+    it('should return 401, because empty id', function(done) {
 
       var p = 'Basic ' + new Buffer(':password').toString('base64');
       request(app).get('/').set('Authorization', p).expect(401, done);
