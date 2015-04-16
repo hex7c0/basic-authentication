@@ -11,7 +11,6 @@
 /*
  * initialize module
  */
-// import
 var authentication = require('..'); // use require('basic-authentication') instead
 var http = require('http');
 
@@ -27,7 +26,5 @@ http.createServer(function(req, res) {
   } else {
     res.end('ko!');
   }
-}).listen(3000, '127.0.0.1');
-
-// server starting
+}).listen(3000);
 console.log('starting "hello world" on port 3000');

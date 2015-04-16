@@ -2,7 +2,6 @@
 /**
  * @file legacy example
  * @module basic-authentication
- * @package basic-authentication
  * @subpackage examples
  * @version 0.0.1
  * @author hex7c0 <hex7c0@gmail.com>
@@ -28,9 +27,6 @@ app.get('/', function(req, res) {
   var found = auth(req);
   // return 'admin' and 'password' (default value)
   res.send('hello ' + found.user + ':' + found.password);
-});
-
-// server starting
-app.listen(3000);
+}).listen(3000);
 console.log('starting "hello world" on port 3000');
 // manually popolate Authorization header

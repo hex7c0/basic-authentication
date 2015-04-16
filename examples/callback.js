@@ -11,7 +11,6 @@
 /*
  * initialize module
  */
-// import
 var authentication = require('..'); // use require('basic-authentication') instead
 var app = require('express')();
 
@@ -31,8 +30,5 @@ app.get('/admin', auth, function(req, res) {
 }).get('/', function(req, res) {
 
   res.send('without auth');
-});
-
-// server starting
-app.listen(3000);
+}).listen(3000);
 console.log('starting "hello world" on port 3000');
