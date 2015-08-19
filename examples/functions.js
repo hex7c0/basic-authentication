@@ -14,7 +14,9 @@
 var authentication = require('..'); // use require('basic-authentication') instead
 var app = require('express')();
 
-// using like middleware for all routing
+/*
+ * using middleware for all routing
+ */
 var auth = authentication({
   functions: true, // return a function
 });

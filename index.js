@@ -3,7 +3,7 @@
  * @file basic-authentication main
  * @module basic-authentication
  * @subpackage main
- * @version 1.5.0
+ * @version 1.6.0
  * @author hex7c0 <hex7c0@gmail.com>
  * @copyright hex7c0 2014
  * @license GPLv3
@@ -116,7 +116,7 @@ function end_check_file(auth, hash, file) {
 
   var psw = hashes.update(request.password).digest('hex');
   request = new RegExp('^' + request.user + ':');
-  for (var i = 0; i < ii; i++) {
+  for (var i = 0; i < ii; ++i) {
     if (request.test(input[i])) {
       var get = input[i].substring(request.source.length - 1);
       if (get === psw) {

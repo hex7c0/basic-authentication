@@ -14,7 +14,9 @@
 var authentication = require('..'); // use require('basic-authentication') instead
 var app = require('express')();
 
-// using like middleware for all routing
+/*
+ * using middleware for all routing
+ */
 app.use(authentication({
   ending: false, // throw an error if wrong
 }));
@@ -26,10 +28,7 @@ app.get('/', function(req, res) {
 }).get('/admin', function(req, res) {
 
   res.send('authentication passed! /admin');
-});
-
-// error handling
-app.use(function(err, req, res, next) {
+}).use(function(err, req, res, next) {// error handling
 
   res.send('error=' + err.message.toLowerCase()); // should print "error=unauthorized" if I'm wrong password
 }).listen(3000);
