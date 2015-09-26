@@ -14,19 +14,16 @@
 var authentication = require('..'); // use require('basic-authentication') instead
 var app = require('express')();
 
-/*
- * use callback
- */
-var auth = authentication();
+var auth = authentication(); // use callback
 
 // express routing
 app.get('/admin', auth, function(req, res) {
 
   // only for "/admin" route
   // if user send wrong user/psw, module raise an error
-  // you can suppress with 'suppression' flag
+  // you can suppress it with 'suppression' flag
 
-  res.send('with auth');
+  res.send('with auth'); // admin:password
 }).get('/', function(req, res) {
 
   res.send('without auth');

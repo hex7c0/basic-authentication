@@ -14,12 +14,10 @@
 var authentication = require('..'); // use require('basic-authentication') instead
 var app = require('express')();
 
-/*
- * using file middleware for all routing
- */
+// using file middleware for all routing
 app.use(authentication({
-  hash: 'sha1',
-  file: 'htpasswd',
+  hash: 'sha1', // type of hash
+  file: 'htpasswd', // path of file
   suppress: true, // suppress throwing Error if wrong user
 }));
 
@@ -27,6 +25,6 @@ app.use(authentication({
 app.get('/', function(req, res) {
 
   // authentication here
-  res.send('hello world!');
+  res.send('hello world!'); // pippo1:pippo
 }).listen(3000);
 console.log('starting "hello world" on port 3000');

@@ -14,9 +14,7 @@
 var authentication = require('..'); // use require('basic-authentication') instead
 var http = require('http');
 
-/*
- * use function
- */
+// as a function
 var auth = authentication();
 
 http.createServer(function(req, res) {

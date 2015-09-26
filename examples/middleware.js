@@ -14,9 +14,7 @@
 var authentication = require('..'); // use require('basic-authentication') instead
 var app = require('express')();
 
-/*
- * using middleware for all routing
- */
+// using middleware for all routing
 app.use(authentication({
   user: 'foo', // set your custom user
   password: 'bar', // set your custom password

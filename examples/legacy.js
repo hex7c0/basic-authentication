@@ -14,9 +14,7 @@
 var authentication = require('..'); // use require('basic-authentication') instead
 var app = require('express')();
 
-/*
- * use like a function
- */
+// use like a function
 var auth = authentication({
   legacy: true
 });
@@ -25,7 +23,7 @@ var auth = authentication({
 app.get('/', function(req, res) {
 
   var found = auth(req);
-  // return 'admin' and 'password' (default value)
+  // return 'admin' and 'password' (default value) as object
   res.send('hello ' + found.user + ':' + found.password);
 }).listen(3000);
 console.log('starting "hello world" on port 3000');
