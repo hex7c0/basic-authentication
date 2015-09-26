@@ -69,7 +69,6 @@ function end_work(err, next, code, res) {
   if (res !== undefined) { // basic_big
     res.writeHead(code);
     res.end(codes);
-    return;
   }
 
   return err(next, codes); // basic_medium

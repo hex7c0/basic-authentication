@@ -12,85 +12,209 @@
  * initialize module
  */
 var authentication = require('..');
-var app = require('express')();
+var express = require('express');
 var request = require('supertest');
+var assert = require('assert');
 
 /*
  * test module
  */
 describe('middleware', function() {
 
-  before(function(done) {
+  describe('with suppress', function() {
 
-    app.use(authentication({
-      suppress: true
-    })).get('/', function(req, res) {
+    var app = express();
 
-      res.send('hello world!');
+    before(function(done) {
+
+      app.use(authentication({
+        suppress: true
+      })).get('/', function(req, res) {
+
+        res.send('hello world!');
+      });
+      done();
     });
-    done();
+
+    it('should return 200', function(done) {
+
+      var p = 'Basic ' + new Buffer('admin:password').toString('base64');
+      request(app).get('/').set('Authorization', p).expect(200, done);
+    });
+
+    describe('header', function() {
+
+      it('should return 401, because no header', function(done) {
+
+        request(app).get('/').expect(401, done);
+      });
+      it('should return 401, because wrong header', function(done) {
+
+        var p = 'Basic ' + new Buffer('admin:foo').toString('base64');
+        request(app).get('/').set('AuthorizatioFoo', p).expect(401, done);
+      });
+      it('should return 401, because wrong string', function(done) {
+
+        var p = 'Foo ' + new Buffer('admin:password').toString('base64');
+        request(app).get('/').set('Authorization', p).expect(401, done);
+      });
+    });
+
+    describe('credential', function() {
+
+      it('should return 401, because no encoded string', function(done) {
+
+        var p = 'Basic admin:password';
+        request(app).get('/').set('Authorization', p).expect(401, done);
+      });
+      it('should return 401, because wrong id', function(done) {
+
+        var p = 'Basic ' + new Buffer('pippo:password').toString('base64');
+        request(app).get('/').set('Authorization', p).expect(401, done);
+      });
+      it('should return 401, because empty id', function(done) {
+
+        var p = 'Basic ' + new Buffer(':password').toString('base64');
+        request(app).get('/').set('Authorization', p).expect(401, done);
+      });
+      it('should return 401, because wrong psw', function(done) {
+
+        var p = 'Basic ' + new Buffer('admin:pippo').toString('base64');
+        request(app).get('/').set('Authorization', p).expect(401, done);
+      });
+      it('should return 401, because empty psw', function(done) {
+
+        var p = 'Basic ' + new Buffer('admin:').toString('base64');
+        request(app).get('/').set('Authorization', p).expect(401, done);
+      });
+      it('should return 401, because both wrong', function(done) {
+
+        var p = 'Basic ' + new Buffer('foo:foo').toString('base64');
+        request(app).get('/').set('Authorization', p).expect(401, done);
+      });
+      it('should return 401, because both empty', function(done) {
+
+        var p = 'Basic ' + new Buffer(':').toString('base64');
+        request(app).get('/').set('Authorization', p).expect(401, done);
+      });
+    });
   });
 
-  it('should return 200', function(done) {
+  describe('without suppress', function() {
 
-    var p = 'Basic ' + new Buffer('admin:password').toString('base64');
-    request(app).get('/').set('Authorization', p).expect(200, done);
-  });
+    var app;
 
-  describe('header', function() {
+    beforeEach(function(done) {
 
-    it('should return 401, because no header', function(done) {
+      app = express();
+      app.use(authentication()).get('/', function(req, res) {
 
-      request(app).get('/').expect(401, done);
+        res.send('hello world!');
+      });
+      done();
     });
-    it('should return 401, because wrong header', function(done) {
 
-      var p = 'Basic ' + new Buffer('admin:foo').toString('base64');
-      request(app).get('/').set('AuthorizatioFoo', p).expect(401, done);
-    });
-    it('should return 401, because wrong string', function(done) {
+    describe('credential', function() {
 
-      var p = 'Foo ' + new Buffer('admin:password').toString('base64');
-      request(app).get('/').set('Authorization', p).expect(401, done);
-    });
-  });
+      it('should return 401 with Error, because no encoded string',
+        function(done) {
 
-  describe('credential', function() {
+          app.use(function(err, req, res, next) {
 
-    it('should return 401, because no encoded string', function(done) {
+            assert.equal(err.message.toLowerCase(), 'unauthorized');
+            done();
+          });
+          var p = 'Basic admin:password';
+          request(app).get('/').set('Authorization', p).expect(401).end(
+            function(err) {
 
-      var p = 'Basic admin:password';
-      request(app).get('/').set('Authorization', p).expect(401, done);
-    });
-    it('should return 401, because wrong id', function(done) {
+              assert.ifError(err);
+            });
+        });
+      it('should return 401 with Error, because wrong id', function(done) {
 
-      var p = 'Basic ' + new Buffer('pippo:password').toString('base64');
-      request(app).get('/').set('Authorization', p).expect(401, done);
-    });
-    it('should return 401, because empty id', function(done) {
+        app.use(function(err, req, res, next) {
 
-      var p = 'Basic ' + new Buffer(':password').toString('base64');
-      request(app).get('/').set('Authorization', p).expect(401, done);
-    });
-    it('should return 401, because wrong psw', function(done) {
+          assert.equal(err.message.toLowerCase(), 'unauthorized');
+          done();
+        });
+        var p = 'Basic ' + new Buffer('pippo:password').toString('base64');
+        request(app).get('/').set('Authorization', p).expect(401).end(
+          function(err) {
 
-      var p = 'Basic ' + new Buffer('admin:pippo').toString('base64');
-      request(app).get('/').set('Authorization', p).expect(401, done);
-    });
-    it('should return 401, because empty psw', function(done) {
+            assert.ifError(err);
+          });
+      });
+      it('should return 401 with Error, because empty id', function(done) {
 
-      var p = 'Basic ' + new Buffer('admin:').toString('base64');
-      request(app).get('/').set('Authorization', p).expect(401, done);
-    });
-    it('should return 401, because both wrong', function(done) {
+        app.use(function(err, req, res, next) {
 
-      var p = 'Basic ' + new Buffer('foo:foo').toString('base64');
-      request(app).get('/').set('Authorization', p).expect(401, done);
-    });
-    it('should return 401, because both empty', function(done) {
+          assert.equal(err.message.toLowerCase(), 'unauthorized');
+          done();
+        });
+        var p = 'Basic ' + new Buffer(':password').toString('base64');
+        request(app).get('/').set('Authorization', p).expect(401).end(
+          function(err) {
 
-      var p = 'Basic ' + new Buffer(':').toString('base64');
-      request(app).get('/').set('Authorization', p).expect(401, done);
+            assert.ifError(err);
+          });
+      });
+      it('should return 401 with Error, because wrong psw', function(done) {
+
+        app.use(function(err, req, res, next) {
+
+          assert.equal(err.message.toLowerCase(), 'unauthorized');
+          done();
+        });
+        var p = 'Basic ' + new Buffer('admin:pippo').toString('base64');
+        request(app).get('/').set('Authorization', p).expect(401).end(
+          function(err) {
+
+            assert.ifError(err);
+          });
+      });
+      it('should return 401 with Error, because empty psw', function(done) {
+
+        app.use(function(err, req, res, next) {
+
+          assert.equal(err.message.toLowerCase(), 'unauthorized');
+          done();
+        });
+        var p = 'Basic ' + new Buffer('admin:').toString('base64');
+        request(app).get('/').set('Authorization', p).expect(401).end(
+          function(err) {
+
+            assert.ifError(err);
+          });
+      });
+      it('should return 401 with Error, because both wrong', function(done) {
+
+        app.use(function(err, req, res, next) {
+
+          assert.equal(err.message.toLowerCase(), 'unauthorized');
+          done();
+        });
+        var p = 'Basic ' + new Buffer('foo:foo').toString('base64');
+        request(app).get('/').set('Authorization', p).expect(401).end(
+          function(err) {
+
+            assert.ifError(err);
+          });
+      });
+      it('should return 401 with Error, because both empty', function(done) {
+
+        app.use(function(err, req, res, next) {
+
+          assert.equal(err.message.toLowerCase(), 'unauthorized');
+          done();
+        });
+        var p = 'Basic ' + new Buffer(':').toString('base64');
+        request(app).get('/').set('Authorization', p).expect(401).end(
+          function(err) {
+
+            assert.ifError(err);
+          });
+      });
     });
   });
 });
