@@ -41,7 +41,7 @@ describe('useragent', function() {
 
       var p = 'Basic ' + new Buffer('foo:bar').toString('base64');
       request(app).get('/').set('user-agent', 'SuPeR').set('Authorization', p)
-      .expect(200, done);
+          .expect(200, done);
     });
   it('should return 403, with correct user and password', function(done) {
 
@@ -52,13 +52,13 @@ describe('useragent', function() {
 
     var p = 'Basic ' + new Buffer(':').toString('base64');
     request(app).get('/').set('user-agent', 'SuPeR').set('Authorization', p)
-    .expect(401, done);
+        .expect(401, done);
   });
   it('should return 401, check Realm', function(done) {
 
     request(app).get('/').expect(401).end(function(err, res) {
 
-      assert.equal(err, null);
+      assert.ifError(err);
       assert.equal(res.header['www-authenticate'], 'Basic realm="PiPPo"');
       done();
     });

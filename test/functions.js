@@ -51,7 +51,7 @@ describe('ending', function() {
     request(app).get('/').set('Authorization', p).expect(200).end(
       function(err) {
 
-        assert.equal(err, null);
+        assert.ifError(err);
       });
   });
 
@@ -67,7 +67,7 @@ describe('ending', function() {
       });
       request(app).get('/').expect(200).end(function(err) {
 
-        assert.equal(err, null);
+        assert.ifError(err);
       });
     });
     it('should return empty string, because wrong header', function(done) {
@@ -82,7 +82,7 @@ describe('ending', function() {
       request(app).get('/').set('AuthorizatioFoo', p).expect(200).end(
         function(err) {
 
-          assert.equal(err, null);
+          assert.ifError(err);
         });
     });
     it('should return empty string, because wrong string', function(done) {
@@ -97,7 +97,7 @@ describe('ending', function() {
       request(app).get('/').set('Authorization', p).expect(200).end(
         function(err) {
 
-          assert.equal(err, null);
+          assert.ifError(err);
         });
     });
   });

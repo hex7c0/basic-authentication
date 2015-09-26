@@ -46,30 +46,15 @@ describe('ending', function() {
 
     it('should return 401, because no header', function(done) {
 
-      app.use(function(err, req, res, next) {
-
-        assert.equal(err.message.toLowerCase(), 'unauthorized');
-        done();
-      });
       request(app).get('/').expect(401, done);
     });
     it('should return 401, because wrong header', function(done) {
 
-      app.use(function(err, req, res, next) {
-
-        assert.equal(err.message.toLowerCase(), 'unauthorized');
-        done();
-      });
       var p = 'Basic ' + new Buffer('admin:foo').toString('base64');
       request(app).get('/').set('AuthorizatioFoo', p).expect(401, done);
     });
     it('should return 401, because wrong string', function(done) {
 
-      app.use(function(err, req, res, next) {
-
-        assert.equal(err.message.toLowerCase(), 'unauthorized');
-        done();
-      });
       var p = 'Foo ' + new Buffer('admin:password').toString('base64');
       request(app).get('/').set('Authorization', p).expect(401, done);
     });
@@ -89,7 +74,7 @@ describe('ending', function() {
         request(app).get('/').set('Authorization', p).expect(401).end(
           function(err) {
 
-            assert.equal(err, null);
+            assert.ifError(err);
           });
       });
     it('should return 401 with Error, because wrong id', function(done) {
@@ -103,7 +88,7 @@ describe('ending', function() {
       request(app).get('/').set('Authorization', p).expect(401).end(
         function(err) {
 
-          assert.equal(err, null);
+          assert.ifError(err);
         });
     });
     it('should return 401 with Error, because empty id', function(done) {
@@ -117,7 +102,7 @@ describe('ending', function() {
       request(app).get('/').set('Authorization', p).expect(401).end(
         function(err) {
 
-          assert.equal(err, null);
+          assert.ifError(err);
         });
     });
     it('should return 401 with Error, because wrong psw', function(done) {
@@ -131,7 +116,7 @@ describe('ending', function() {
       request(app).get('/').set('Authorization', p).expect(401).end(
         function(err) {
 
-          assert.equal(err, null);
+          assert.ifError(err);
         });
     });
     it('should return 401 with Error, because empty psw', function(done) {
@@ -145,7 +130,7 @@ describe('ending', function() {
       request(app).get('/').set('Authorization', p).expect(401).end(
         function(err) {
 
-          assert.equal(err, null);
+          assert.ifError(err);
         });
     });
     it('should return 401 with Error, because both wrong', function(done) {
@@ -159,7 +144,7 @@ describe('ending', function() {
       request(app).get('/').set('Authorization', p).expect(401).end(
         function(err) {
 
-          assert.equal(err, null);
+          assert.ifError(err);
         });
     });
     it('should return 401 with Error, because both empty', function(done) {
@@ -173,7 +158,7 @@ describe('ending', function() {
       request(app).get('/').set('Authorization', p).expect(401).end(
         function(err) {
 
-          assert.equal(err, null);
+          assert.ifError(err);
         });
     });
   });
