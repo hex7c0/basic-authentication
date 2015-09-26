@@ -1,5 +1,5 @@
 {
-  "version": "1.6.0",
+  "version": "1.6.1",
   "name": "basic-authentication",
   "description": "http basic authentication",
   "keywords": [
@@ -9,7 +9,7 @@
     "authorization"
   ],
   "preferGlobal": false,
-  "homepage": "http://supergiovane.tk/#/basic-authentication",
+  "homepage": "https://github.com/hex7c0/basic-authentication",
   "author": {
     "name": "hex7c0",
     "email": "hex7c0@gmail.com",
