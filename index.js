@@ -53,22 +53,23 @@ function end_err(next, code) {
  * 
  * @function end_work
  * @param {Function} err - error function
- * @param {next} [next] - continue routes
+ * @param {Function} [next] - continue routes
  * @param {Integer} [code] - response error code
  * @param {Object} [res] - response to client
- * @return {next|Boolean}
+ * @return {Function|Boolean}
  */
 function end_work(err, next, code, res) {
 
-  if (!code) { // success
+  if (code === undefined) { // success
     return next ? next() : true;
   }
 
   var codes = http[code]; // error
 
-  if (res) { // basic_big
+  if (res !== undefined) { // basic_big
     res.writeHead(code);
     res.end(codes);
+    return;
   }
 
   return err(next, codes); // basic_medium
@@ -102,12 +103,7 @@ function end_check_file(auth, hash, file) {
   var input = require('fs').readFileSync(file, {
     encoding: 'utf8',
   }).match(end);
-  var ii;
-  if (input.length) {
-    ii = input.length;
-  } else {
-    ii = 0;
-  }
+  var ii = input.length || 0;
 
   var request = basic_legacy(auth, true);
   if (!request.user || !request.password) { // empty field
