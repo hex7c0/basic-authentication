@@ -268,7 +268,7 @@ function authentication(opt) {
    * @param {Object} req - client request
    * @param {Object} res - response to client
    * @param {next} [next] - continue routes
-   * @return {Boolean}
+   * @return {void}
    */
   function basic_big(req, res, next) {
 

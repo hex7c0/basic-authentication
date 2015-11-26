@@ -1,4 +1,4 @@
-# [basic-authentication](http://supergiovane.tk/#/basic-authentication)
+# [basic-authentication](https://github.com/hex7c0/basic-authentication)
 
 [![NPM version](https://img.shields.io/npm/v/basic-authentication.svg)](https://www.npmjs.com/package/basic-authentication)
 [![Linux Status](https://img.shields.io/travis/hex7c0/basic-authentication.svg?label=linux)](https://travis-ci.org/hex7c0/basic-authentication)
