@@ -23,6 +23,9 @@
     "url": "https://github.com/hex7c0/basic-authentication/issues",
     "email": "hex7c0@gmail.com"
   },
+  "directories": {
+    "example": "./examples"
+  },
   "main": "index.min.js",
   "dependencies": {
     "setheaders": "0.1.6"
