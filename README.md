@@ -1,7 +1,7 @@
 # [basic-authentication](https://github.com/hex7c0/basic-authentication)
 
 [![NPM version](https://img.shields.io/npm/v/basic-authentication.svg)](https://www.npmjs.com/package/basic-authentication)
-[![Linux Status](https://img.shields.io/travis/hex7c0/basic-authentication.svg?label=linux)](https://travis-ci.org/hex7c0/basic-authentication)
+[![Linux Status](https://img.shields.io/travis/hex7c0/basic-authentication.svg?label=linux-osx)](https://travis-ci.org/hex7c0/basic-authentication)
 [![Windows Status](https://img.shields.io/appveyor/ci/hex7c0/basic-authentication.svg?label=windows)](https://ci.appveyor.com/project/hex7c0/basic-authentication)
 [![Dependency Status](https://img.shields.io/david/hex7c0/basic-authentication.svg)](https://david-dm.org/hex7c0/basic-authentication)
 [![Coveralls](https://img.shields.io/coveralls/hex7c0/basic-authentication.svg)](https://coveralls.io/r/hex7c0/basic-authentication)
