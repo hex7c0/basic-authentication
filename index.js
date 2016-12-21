@@ -25,30 +25,6 @@ var end = new RegExp(/(.+)/g);
  * functions
  */
 /**
- * empty function
- * 
- * @function end_empty
- */
-function end_empty() {
-
-  return;
-}
-
-/**
- * end with error. Propagate Error to callback
- * 
- * @function end_err
- * @param {next} next - continue routes
- * @param {String} code - response error
- * @return {Error}
- */
-function end_err(next, code) {
-
-  var err = new Error(code);
-  return next ? next(err) : err;
-}
-
-/**
  * end of work
  * 
  * @function end_work
@@ -227,9 +203,24 @@ function authentication(opt) {
   }
 
   // error handler
-  var err = end_err;
+  /**
+   * end with error. Propagate Error to callback
+   * 
+   * @function end_err
+   * @param {next} next - continue routes
+   * @param {String} code - response error
+   * @return {Error}
+   */
+  var err = function(next, code) {
+
+    var err = new Error(code);
+    return next ? next(err) : err;
+  };
   if (my.suppress) {
-    err = end_empty;
+    err = function() {
+
+      return;
+    };
   }
 
   /**
