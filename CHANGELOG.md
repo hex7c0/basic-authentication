@@ -1,3 +1,10 @@
+v1.8.0 / 2016-12-21
+==================
+
+  * Remove support for `node`@<4
+  * Tested against `node`@7
+  * Update `setheaders`@0.2.0
+
 v1.7.0 / 2016-09-12
 ==================
 
