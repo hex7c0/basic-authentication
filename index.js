@@ -3,7 +3,7 @@
  * @file basic-authentication main
  * @module basic-authentication
  * @subpackage main
- * @version 1.7.0
+ * @version 1.9.0
  * @author hex7c0 <hex7c0@gmail.com>
  * @copyright hex7c0 2014
  * @license GPLv3
@@ -47,7 +47,7 @@ function end_work(err, next, code, res) {
     res.end(codes);
   }
 
-  return err(next, codes); // basic_medium
+  err(next, codes); // basic_medium
 }
 
 /**
@@ -249,7 +249,7 @@ function authentication(opt) {
 
     // first attempt
     res.writeHead(401, my.realm);
-    return res.end();
+    res.end();
   }
 
   /**

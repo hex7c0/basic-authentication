@@ -1,5 +1,5 @@
 {
-  "version": "1.8.0",
+  "version": "1.9.0",
   "name": "basic-authentication",
   "description": "http basic authentication",
   "keywords": [
@@ -47,5 +47,5 @@
     "test": "mocha --bail --check-leaks",
     "test-cov": "istanbul cover node_modules/mocha/bin/_mocha --report lcovonly"
   },
-  "license": "GPL-3.0"
+  "license": "Apache-2.0"
 }

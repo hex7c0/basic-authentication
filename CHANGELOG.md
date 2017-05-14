@@ -1,3 +1,9 @@
+v1.9.0 / 2017-05-14
+==================
+
+  * Change LICENSE to Apache2 from GPL3
+  * Update `setheaders`@0.3.0
+
 v1.8.0 / 2016-12-21
 ==================
 
